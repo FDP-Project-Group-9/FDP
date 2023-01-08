@@ -1,1 +1,1 @@
-To start the Backend server run - npm run dev serever
+To start the Backend server run - npm run dev
