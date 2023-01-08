@@ -1,6 +1,7 @@
 const express=require('express')
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+require('dotenv').config();
 
 
 const app = express();
@@ -12,7 +13,7 @@ app.use(bodyParser.json());
 
 
 // DB Config
-const db = require('./config/keys').mongoURI;
+const db = process.env.MongoURL;
 
 // Connect to Mongoose
 mongoose
