@@ -6,7 +6,7 @@ const passport = require('passport');
 
 
 
-const users = require('./routes/api/users');
+const users = require('./routes/api/user');
 
 const app = express();
 
