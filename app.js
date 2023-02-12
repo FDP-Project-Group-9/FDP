@@ -72,23 +72,25 @@ app.use((error, req, res, next) => {
 
 connectDB(() => {
   app.listen(port, () => {
-    fs.stat("./files/user-docs", (err) => {
+    fs.stat("./files", (err) => {
       if(err){
         fs.mkdir("./files", {}, error => {
           if(error){
             console.log('Error occured while creating directory for uploads...');
             console.log(error);
           }
-          else{
-            fs.mkdir("./files/user-docs", error => {
-              if(error){
-                console.log('Error occured while creating directory for uploads...');
-                console.log(error);
-              }
-            })
-          }
         });
       }
+      fs.stat("./files/user-docs", err => {
+        if(err){
+          fs.mkdir("./files/user-docs", error => {
+            if(error){
+              console.log('Error occured while creating directory for uploads...');
+              console.log(error);
+            }
+          });
+        }
+      })
     })
     console.log(`Server running on port ${port}`)
   });
