@@ -1,8 +1,7 @@
 const { getDB } = require('../config/db');
 const { types } = require('../utils/dbTypes');
 const { throwError } = require('../utils/utilFunctions');
-
-const tableName = 'DevSchema.users';
+const { tableNames } = require('../utils/constants');
 module.exports = class User {
 
   constructor(roleId, firstName, lastName, title, dob, gender, emailId, mobileNumber, password){
@@ -19,7 +18,7 @@ module.exports = class User {
 
   async save () {
     const db = getDB();
-    const queryStmt = `INSERT INTO ${tableName} values(
+    const queryStmt = `INSERT INTO ${tableNames.USERS} values(
       @first_name, 
       @last_name, 
       @email_id,
@@ -53,7 +52,7 @@ module.exports = class User {
 
   static async findUserByEmail(emailId) {
     const db = getDB();
-    const queryStmt = `SELECT user_id FROM ${tableName} WHERE email_id = @email_id`;
+    const queryStmt = `SELECT user_id FROM ${tableNames.USERS} WHERE email_id = @email_id`;
     try {
       return await db.request()
       .input('email_id', types.VarChar(255), emailId)
@@ -66,7 +65,7 @@ module.exports = class User {
 
   static async findUserByMobile(mobileNo) {
     const db = getDB();
-    const queryStmt = `SELECT user_id FROM ${tableName} WHERE mobile_no = @mobile_no`;
+    const queryStmt = `SELECT user_id FROM ${tableNames.USERS} WHERE mobile_no = @mobile_no`;
     try {
       return await db.request()
       .input('mobile_no', types.VarChar(10), mobileNo)
@@ -75,5 +74,5 @@ module.exports = class User {
     catch(err) {
       throwError(err.originalError.info.message, 500);
     }
-  }
+  };
 };

@@ -1,6 +1,9 @@
+const fs = require('fs');
 const bycrypt = require('bcrypt');
 
 const User = require('../models/user');
+const UserDocs = require("../models/user_docs");
+const { throwError } = require('../utils/utilFunctions');
 
 exports.signup = ( async (req, res, next) => {
     const firstName = req.body["first_name"];
@@ -11,6 +14,7 @@ exports.signup = ( async (req, res, next) => {
     const emailId = req.body["email_id"];
     const mobileNumber = req.body["mobile_no"];
     const gender = req.body.gender;
+    
     let password = req.body.password;
     try {
         password = await bycrypt.hash(password, 12);
@@ -24,10 +28,37 @@ exports.signup = ( async (req, res, next) => {
     const user = new User(roleId, firstName, lastName, title, dob, gender, emailId, mobileNumber, password);
 
     try{
-        const result = await user.save();
+        await user.save();
         return res.status(201).json({msg: "User successfully signed up"});
     }
     catch(err){
         return next(err);
     }
 });
+
+exports.uploadFiles = async (req, res, next) => {
+    const emailId = req.body['email_id'];
+    const files = req.files;
+    try{
+        const result = await User.findUserByEmail(emailId);
+        if(result.recordset.length == 0){
+            throwError("User not found!", 404);
+        }
+        const userId = result.recordset[0]['user_id'];
+        await UserDocs.addDocumentsForUser(userId, files);
+        res.status(200).json({msg: "Files uploaded successfully!"});
+    }
+    catch(err){
+        // removing files from file system if error occurs...
+        files.forEach(file => {
+            fs.rm(file.path, {}, err => {
+                if(err){
+                    const error = new Error();
+                    error.msg = "Something went wrong while deleting file from system!";
+                    error.status = 500;
+                }
+            });
+        });
+        next(err);
+    }
+}
