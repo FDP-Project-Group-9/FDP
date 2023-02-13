@@ -16,9 +16,13 @@ module.exports = class User {
     this.password = password;
   }
 
+
   async save () {
+    console.log(tableNames.USERS)
+    console.log(this.gender)
     const db = getDB();
-    const queryStmt = `INSERT INTO ${tableNames.USERS} values(
+    const queryStmt = `INSERT INTO ${tableNames.USERS} (first_name, last_name, email_id,mobile_no, dob,title,password,role_id,profile_approved,gender) 
+    values(
       @first_name, 
       @last_name, 
       @email_id,

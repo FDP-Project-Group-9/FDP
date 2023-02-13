@@ -1,5 +1,5 @@
 exports.tableNames = {
-    USERS: 'DevSchema.users',
-    ROLES: 'DevSchema.roles',
-    USERDOCS: 'DevSchema.user_docs'
+    USERS: 'users',
+    ROLES: 'roles',
+    USERDOCS: 'user_docs'
 };
