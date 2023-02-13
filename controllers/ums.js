@@ -26,7 +26,7 @@ exports.signup = ( async (req, res, next) => {
     };
 
     const user = new User(roleId, firstName, lastName, title, dob, gender, emailId, mobileNumber, password);
-
+     console.log(user)
     try{
         await user.save();
         return res.status(201).json({msg: "User successfully signed up"});
