@@ -24,6 +24,17 @@ create table users (
 	FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
 GO
+
+IF OBJECT_ID(N'user_docs', N'U') is NULL
+create table user_docs (
+	id int IDENTITY(1, 1),
+	file_path varchar (255) NOT NULL,
+	user_id int NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+GO
+
 /*
 	need to learn and understand how to store documents required for verification of user profile.
 */

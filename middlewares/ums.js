@@ -155,7 +155,32 @@ exports.signupValidation = (req, res, next) => {
             return {    
                 msg: error.msg,
                 status: 422,
-                param: error.param
+            }
+        });
+        return res.status(400).json({errors: errs});
+    }
+    next();
+};
+
+exports.uploadFilesValidationRules = () => {
+    return [
+        body("email_id")
+            .exists()
+            .withMessage("Email is required!")
+            .bail()
+            .isEmail()
+            .withMessage("Invalid Email")
+        ,
+    ];
+};
+
+exports.uploadFilesValidation = (req, res, next) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        const errs =  errors.array().map(error => {
+            return {    
+                msg: error.msg,
+                status: 422,
             }
         });
         return res.status(400).json({errors: errs});
