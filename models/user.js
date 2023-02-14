@@ -18,8 +18,6 @@ module.exports = class User {
 
 
   async save () {
-    console.log(tableNames.USERS)
-    console.log(this.gender)
     const db = getDB();
     const queryStmt = `INSERT INTO ${tableNames.USERS} (first_name, last_name, email_id,mobile_no, dob,title,password,role_id,profile_approved,gender) 
     values(
@@ -56,7 +54,7 @@ module.exports = class User {
 
   static async findUserByEmail(emailId) {
     const db = getDB();
-    const queryStmt = `SELECT user_id FROM ${tableNames.USERS} WHERE email_id = @email_id`;
+    const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE email_id = @email_id`;
     try {
       return await db.request()
       .input('email_id', types.VarChar(255), emailId)
@@ -69,7 +67,7 @@ module.exports = class User {
 
   static async findUserByMobile(mobileNo) {
     const db = getDB();
-    const queryStmt = `SELECT user_id FROM ${tableNames.USERS} WHERE mobile_no = @mobile_no`;
+    const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE mobile_no = @mobile_no`;
     try {
       return await db.request()
       .input('mobile_no', types.VarChar(10), mobileNo)
@@ -78,5 +76,17 @@ module.exports = class User {
     catch(err) {
       throwError(err.originalError.info.message, 500);
     }
+  };
+
+  static async findAllAdministrators() {
+    const db = getDB();
+    const queryStmt = `SELECT email_id FROM ${tableNames.USERS} WHERE role_id = 1`;
+    try{
+      return await db.request()
+      .query(queryStmt);
+    }
+    catch(err){
+      throwError(err.originalError.info.message, 500);
+    };
   };
 };
