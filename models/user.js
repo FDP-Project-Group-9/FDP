@@ -67,6 +67,19 @@ module.exports = class User {
     }
   };
 
+  static async findUserdetailByEmail(emailId) {
+    const db = getDB();
+    const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE email_id = @email_id`;
+    try {
+      return await db.request()
+      .input('email_id', types.VarChar(255), emailId)
+      .query(queryStmt);
+    }
+    catch(err){
+      throwError(err.originalError.info.message, 500);
+    }
+  };
+
   static async findUserByMobile(mobileNo) {
     const db = getDB();
     const queryStmt = `SELECT user_id FROM ${tableNames.USERS} WHERE mobile_no = @mobile_no`;
