@@ -4,6 +4,7 @@ const jwt=require('jsonwebtoken')
 const User = require('../models/user');
 const UserDocs = require("../models/user_docs");
 const { throwError } = require('../utils/utilFunctions');
+const { emailGenerator } = require('../utils/email');
 
 exports.signup = ( async (req, res, next) => {
     const firstName = req.body["first_name"];
@@ -26,7 +27,6 @@ exports.signup = ( async (req, res, next) => {
     };
 
     const user = new User(roleId, firstName, lastName, title, dob, gender, emailId, mobileNumber, password);
-     console.log(user)
     try{
         await user.save();
         return res.status(201).json({msg: "User successfully signed up"});
@@ -70,6 +70,13 @@ exports.login= async(req,res,next)=>{
 exports.uploadFiles = async (req, res, next) => {
     const emailId = req.body['email_id'];
     const files = req.files;
+    const attachments = files.map(file => {
+        return {
+            path: file.path,
+            contentType: file.mimetype,
+        };
+    });
+
     try{
         const result = await User.findUserByEmail(emailId);
         if(result.recordset.length == 0){
@@ -78,6 +85,24 @@ exports.uploadFiles = async (req, res, next) => {
         const userId = result.recordset[0]['user_id'];
         await UserDocs.addDocumentsForUser(userId, files);
         res.status(200).json({msg: "Files uploaded successfully!"});
+
+        try{
+            const admins = await User.findAllAdministrators();
+            const userEmailId = result.recordset[0]["email_id"];
+            const userName = result.recordset[0]["first_name"] + " " + result.recordset[0]["last_name"];
+            const adminEmails = admins.recordset.map(record => record["email_id"]).join(', ');
+            const subject = "Coordinator user verification required!";
+            const content = `
+                <h3>User Verification Required!</h3>
+                <p>Please find the attached documents to verify the user
+                 <b>${userName}<b> (${userEmailId}).
+                </p>
+            `;
+            emailGenerator(adminEmails, subject, content, attachments);
+        }
+        catch(err){
+            next(err);
+        }
     }
     catch(err){
         // removing files from file system if error occurs...
