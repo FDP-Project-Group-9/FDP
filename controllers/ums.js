@@ -104,7 +104,7 @@ exports.userDetails=async (req,res,next)=>{
 exports.authorize=async(req,res,next)=>{
     try{
      
-     const authorized_user=await User.findUserByEmail(req.params.id)
+     const authorized_user=await User.findUserById(req.params.id)
      let authorize_user=authorized_user.recordsets[0][0] 
       if(!authorize_user){
         const err={}
@@ -116,6 +116,8 @@ exports.authorize=async(req,res,next)=>{
         authorize_user=await User.findUserById(req.params.id)
         authorize_user=authorized_user.recordsets[0][0]
         return res.status(201).json({user:authorize_user})  
+   
+
     }
     catch(err){
         return next(err)
