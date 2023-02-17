@@ -178,7 +178,7 @@ exports.loginValidationRules=()=>{
                 if(result.recordset.length < 1)
                     return Promise.reject(
                         {
-                            errorMsg: "User with email id doesn't exists!",
+                            errorMsg: "Email is Incorrect",
                             status: 400
                         }
                     );           
@@ -196,6 +196,7 @@ exports.loginValidationRules=()=>{
         body("password")
             .exists()
             .withMessage("Password is required!")
+            
     ]
 }
 

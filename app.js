@@ -5,6 +5,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const uniqueFilename = require('unique-filename');
+const passport=require('passport')
 
 
 require('dotenv').config();
@@ -15,6 +16,12 @@ const { connectDB } = require('./config/db');
 
 const port = process.env.PORT || 5000;
 const app = express();
+
+// Passport middleware
+app.use(passport.initialize());
+
+// Passport Config
+require('./middlewares/passport')(passport);
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {

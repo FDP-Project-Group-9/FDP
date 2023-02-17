@@ -65,18 +65,22 @@ module.exports = class User {
     }
   };
 
-  static async findUserdetailByEmail(emailId) {
+  static async findUserById(user_id) {
     const db = getDB();
-    const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE email_id = @email_id`;
+    const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE user_id = @user_id`;
     try {
       return await db.request()
-      .input('email_id', types.VarChar(255), emailId)
+      .input('user_id', types.Int, user_id)
       .query(queryStmt);
     }
     catch(err){
-      throwError(err.originalError.info.message, 500);
+      console.log(err)
+      return err
+      // throwError(err.originalError.info.message, 500);
     }
   };
+
+  
 
   static async findUserByMobile(mobileNo) {
     const db = getDB();

@@ -40,10 +40,17 @@ exports.signup = ( async (req, res, next) => {
 exports.login= async(req,res,next)=>{
     const emailId = req.body['email_id'];
     const password=req.body.password
-
-    const user_details=await User.findUserdetailByEmail(emailId);
+    try{
+    const user_details=await User.findUserByEmail(emailId);
     const user=user_details.recordsets[0][0]
-    bycrypt.compare(password,user.password)
+
+    if(user.profile_approved!==true){
+        const err={}
+        err.msg="Registration of User is not approved"
+        err.status=403
+          return next(err)
+    }
+      bycrypt.compare(password,user.password)
     .then(isMatch =>{
         if(isMatch){
             const payload={id:user.user_id,email:user.email_id}
@@ -57,15 +64,43 @@ exports.login= async(req,res,next)=>{
           })
         }
         else {
-          return res.status(401).json({
-            msg: "Password is Incorrect"
-          })
+            const err={}
+            err.msg="Password is Incorrect"
+            err.status=401
+              return next(err)
         }
     })
     .catch(err=>{
         return next(err);
     })
 }
+catch(err){
+    return next(err)
+}
+}
+
+
+exports.userDetails=async (req,res,next)=>{
+    const id=req.params.id
+    try{
+    const user_details=await User.findUserById(id)
+    const user=user_details.recordsets[0][0]
+    if(user.profile_approved!==true){
+        const err={}
+        err.msg="Wrong Id"
+        err.status=403
+          return next(err)
+    }
+
+    return res.status(201).json({user:user})    
+}
+    catch(err){
+        return next(err)
+    }
+
+
+}
+
 
 exports.uploadFiles = async (req, res, next) => {
     const emailId = req.body['email_id'];
