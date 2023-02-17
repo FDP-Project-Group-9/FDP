@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const { signup, uploadFiles,login,userDetails } = require('../controllers/ums');
+const { signup, uploadFiles,login,userDetails,authorize } = require('../controllers/ums');
 const { 
     signupValidationRules, 
     AuthenticationValidation,
@@ -20,5 +20,7 @@ routes.post("/upload-files", uploadFilesValidationRules(), uploadFilesValidation
 routes.post("/login",loginValidationRules(),AuthenticationValidation,login);
 
 routes.get('/user-details/:id',passport.authenticate('jwt', { session: false }),userDetails);
+
+routes.put('/authorize/:id',passport.authenticate('jwt',{session:false}),authorize)
 
 module.exports = routes;

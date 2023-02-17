@@ -53,7 +53,7 @@ exports.login= async(req,res,next)=>{
       bycrypt.compare(password,user.password)
     .then(isMatch =>{
         if(isMatch){
-            const payload={id:user.user_id,email:user.email_id}
+            const payload={id:user.user_id,email:user.email_id,role_id:user.role_id}
 
             //Sign Token
           jwt.sign(payload,process.env.SECRET_KEY,(err,token)=>{
@@ -101,8 +101,30 @@ exports.userDetails=async (req,res,next)=>{
 
 }
 
+exports.authorize=async(req,res,next)=>{
+    try{
+     
+     const authorized_user=await User.findUserByEmail(req.params.id)
+     let authorize_user=authorized_user.recordsets[0][0] 
+      if(!authorize_user){
+        const err={}
+        err.msg="User not found"
+        err.status=404
+       return next(err)
+    }
+        const updation=await User.updateUserRoleId(true,authorize_user.user_id)
+        authorize_user=await User.findUserById(req.params.id)
+        authorize_user=authorized_user.recordsets[0][0]
+        return res.status(201).json({user:authorize_user})  
+    }
+    catch(err){
+        return next(err)
+    }
+    }
 
-exports.uploadFiles = async (req, res, next) => {
+
+
+exports.uploadFiles = async (req, res, next) => { 
     const emailId = req.body['email_id'];
     const files = req.files;
     const attachments = files.map(file => {
