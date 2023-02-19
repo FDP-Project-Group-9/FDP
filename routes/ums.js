@@ -21,6 +21,6 @@ routes.post("/login",loginValidationRules(),AuthenticationValidation,login);
 
 routes.get('/user-details/:id',passport.authenticate('jwt', { session: false }),userDetails);
 
-routes.put('/authorize/:id',passport.authenticate('jwt',{session:false}),authorize)
+routes.put('/authorize-user/:id',passport.authenticate('jwt',{session:false}),authorize)
 
 module.exports = routes;
