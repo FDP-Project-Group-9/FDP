@@ -142,7 +142,7 @@ exports.signupValidationRules = () => {
     ];
 };
 
-exports.signupValidation = (req, res, next) => {
+exports.AuthenticationValidation = (req, res, next) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()){
         const errs =  errors.array().map(error => {
@@ -161,6 +161,46 @@ exports.signupValidation = (req, res, next) => {
     }
     next();
 };
+
+
+exports.loginValidationRules=()=>{
+    return [
+        body('email_id')
+        .exists()
+        .withMessage("Email is Required")
+        .bail()
+        .isEmail()
+        .withMessage("Invalid Email")
+        .bail()
+        .custom(async (emailId)=>{
+            try{
+                const result = await User.findUserByEmail(emailId);
+                if(result.recordset.length < 1)
+                    return Promise.reject(
+                        {
+                            errorMsg: "Email is Incorrect",
+                            status: 400
+                        }
+                    );           
+            }
+            catch(err){
+                return Promise.reject(
+                    { 
+                        errorMsg: err.msg, 
+                        status: err.status
+                    }
+                );
+            }
+        })
+        ,
+        body("password")
+            .exists()
+            .withMessage("Password is required!")
+            
+    ]
+}
+
+
 
 exports.uploadFilesValidationRules = () => {
     return [

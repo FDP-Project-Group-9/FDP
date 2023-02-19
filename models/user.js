@@ -65,6 +65,37 @@ module.exports = class User {
     }
   };
 
+  static async findUserById(user_id) {
+    const db = getDB();
+    const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE user_id = @user_id`;
+    try {
+      return await db.request()
+      .input('user_id', types.Int, user_id)
+      .query(queryStmt);
+    }
+    catch(err){
+      return err
+      // throwError(err.originalError.info.message, 500);
+    }
+  };
+
+  static async updateUserRoleId(profile_approved,user_id) {
+    const db = getDB();
+    const queryStmt = `UPDATE ${tableNames.USERS} SET profile_approved=@profile_approved WHERE user_id = @user_id`;
+    try {
+      return await db.request()
+      .input('profile_approved',types.Bit,profile_approved)
+      .input('user_id', types.Int, user_id)
+      .query(queryStmt);
+    }
+    catch(err){
+      return err
+      // throwError(err.originalError.info.message, 500);
+    }
+  };
+
+  
+
   static async findUserByMobile(mobileNo) {
     const db = getDB();
     const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE mobile_no = @mobile_no`;
