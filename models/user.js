@@ -74,8 +74,7 @@ module.exports = class User {
       .query(queryStmt);
     }
     catch(err){
-      return err
-      // throwError(err.originalError.info.message, 500);
+      throwError(err.originalError.info.message, 500);
     }
   };
 

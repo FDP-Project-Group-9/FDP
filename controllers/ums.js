@@ -79,7 +79,8 @@ exports.userDetails=async (req,res,next)=>{
     try{
         const user_details=await User.findUserById(id);
         const user=user_details.recordsets[0][0];
-        delete user.password;
+        if(user)
+            delete user.password;
         if(!user){
             throwError("Invalid User id", 400);
         }

@@ -13,6 +13,7 @@ require('dotenv').config();
 const onBoardingRoutes = require('./routes/ums');
 
 const { connectDB } = require('./config/db');
+const { passportMiddleware } = require('./middlewares/passport');
 
 const port = process.env.PORT || 5000;
 const app = express();
@@ -21,7 +22,6 @@ const app = express();
 app.use(passport.initialize());
 
 // Passport Config
-require('./middlewares/passport')(passport);
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -58,6 +58,9 @@ app.use(cors());
 // Body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use((req, res, next) => {
+  passportMiddleware(passport, next);
+})
 
 // Use Routes
 app.use('/ums', upload.array("docs"), onBoardingRoutes);
