@@ -92,6 +92,7 @@ GO
 IF OBJECT_ID(N'institute_details', N'U') is null
 create table institute_details (
 	id int IDENTITY(1,1),
+	coordinator_id int NOT NULL,
 	aicte_approved BIT,
 	pid int,
 	institute_type varchar (30) NOT NULL,
@@ -99,7 +100,8 @@ create table institute_details (
 	institute_address varchar (255) NOT NULL,
 	state_name varchar (50),
 	district_name varchar (50),
-	PRIMARY KEY (id)
+	PRIMARY KEY (id),
+	FOREIGN KEY(coordinator_id) REFERENCES users(user_id)
 );
 GO
 

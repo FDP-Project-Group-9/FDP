@@ -1,4 +1,5 @@
 const { body } = require("express-validator");
+const { default: isBoolean } = require("validator/lib/isboolean");
 const WorkshopSpecialization = require("../models/workshopSpecialization");
 
 
@@ -14,7 +15,7 @@ exports.getWorkshopDraftValidations = () => {
     ];
 };
 
-exports.addCoordinatorDetailsValidations = () => {
+exports.coordinatorDetailsValidations = () => {
     return [
         body("father_name")
             .exists()
@@ -73,5 +74,31 @@ exports.addCoordinatorDetailsValidations = () => {
                 }
             })
         ,
+    ];
+};
+
+
+exports.insituteDetailsValidations = () => {
+    return [
+        body("institute_type")
+            .exists()
+            .withMessage("Insitute Type is required!")
+            .bail()
+            .isLength({min: 1, max: 30})
+            .withMessage("Length of institute type should be between 1 and 30!")
+        ,
+        body("institute_name")
+            .exists()
+            .withMessage("Institute Name is required!")
+            .bail()
+            .isLength({min:1, max: 100})
+            .withMessage("Lenght of institute name should be between 1 and 100")
+        ,
+        body("institute_address")
+            .exists()
+            .withMessage("Institute address is required!")
+            .bail()
+            .isLength({min:1, max: 255})
+            .withMessage("Length of institute address should be between 1 adnd 255")
     ];
 };

@@ -19,4 +19,17 @@ exports.coordinator_details = {
         specializationId: 'specialization_id',
         experience: 'experience',
     }
-}
+};
+
+exports.institute_details = {
+    colNames: {
+        coordinator_id: 'coordinator_id',
+        aicteApproved: 'aicte_approved',
+        pid: 'pid',
+        instituteType: 'institute_type',
+        instituteName: 'institute_name',
+        instituteAddress: 'institute_address',
+        stateName: 'state_name',
+        districtName: 'district_name'
+    }
+};

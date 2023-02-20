@@ -1,5 +1,7 @@
 const Workshop = require("../models/workshop");
 const CoordinatorDetails = require("../models/coordinatorDetails");
+const InstituteDetails = require("../models/instituteDetails");
+
 const { throwError } = require("../utils/utils");
 
 exports.createWorkshopDraft = async (req, res, next) => {
@@ -48,7 +50,8 @@ exports.putCoordinatorDetails = async (req, res, next) => {
     };
 
     let details; 
-    //check if coordinator details already exist
+
+    //find coordinator details if it exists
     try{
         details = await CoordinatorDetails.findDetails(requestData.coordinator_id);
         details = details.recordset[0];
@@ -81,6 +84,64 @@ exports.putCoordinatorDetails = async (req, res, next) => {
             const result = await coordinatorDetails.addCoordinatorDetails();
             res.status(201).json({
                 msg: "Coordinator details added successfully!"
+            });
+        }
+        catch(err){
+            next(err);
+        }
+    }
+};
+
+exports.putInstituteDetails = async (req, res, next) => {
+    const user = res.locals.user;
+    const userId = user['user_id'];
+    const edit = req.query.edit;
+
+    const requestData = {
+        coordinator_id: userId,
+        aicte_approved: req.body['aicte_approved'],
+        pid: req.body['pid'],
+        institute_type: req.body['institute_type'],
+        institute_name: req.body['institute_name'],
+        institute_address: req.body['institute_address'],
+        state_name: req.body['state_name'],
+        district_name: req.body['district_name']
+    };
+
+    let details;
+
+    // find institute details if it exists
+    try{
+        details = await InstituteDetails.findDetails(userId);
+        details = details.recordset[0];
+    }
+    catch(err){
+        next(err);
+    }
+
+    if(edit && edit.toLowerCase() == 'true'){
+        try {
+            if(!details){
+                throwError("Details not found!", 404);
+            }
+            const result = await InstituteDetails.updateDetails(requestData);
+            res.status(200).json({
+                msg: "Insitute Details updated successfully!"
+            });
+        }
+        catch(err){
+            next(err);
+        }
+    }
+    else{
+        try{
+            if(details){
+                throwError("Insitute details already exist, cannot add new!", 409);
+            }
+            const instituteDetails = new InstituteDetails(requestData);
+            const result = await instituteDetails.addInstituteDetails();
+            res.status(201).json({
+                msg: "Insitute details added successfully!"
             });
         }
         catch(err){
