@@ -1,7 +1,6 @@
 const { getDB } = require('../config/db');
-const { types } = require('../utils/dbTypes');
-const { throwError } = require('../utils/utilFunctions');
-const { tableNames } = require('../utils/constants');
+const { dbTypes, tableNames, throwError } = require('../utils/utils');
+
 module.exports = class User {
 
   constructor(roleId, firstName, lastName, title, dob, gender, emailId, mobileNumber, password){
@@ -35,16 +34,16 @@ module.exports = class User {
 
     try {
       return await db.request()
-      .input('first_name', types.VarChar(30), this.firstName)
-      .input('last_name', types.VarChar(30), this.lastName)
-      .input('email_id', types.VarChar(255), this.emailId)
-      .input('mobile_no', types.VarChar(10), this.mobileNumber)
-      .input('dob', types.Date, this.dob)
-      .input('title', types.VarChar(5), this.title)
-      .input('password', types.VarChar(255), this.password)
-      .input('role_id', types.Int, this.roleId)
-      .input('profile_approved', types.Bit, false)
-      .input('gender', types.VarChar(10), this.gender)
+      .input('first_name', dbTypes.VarChar(30), this.firstName)
+      .input('last_name', dbTypes.VarChar(30), this.lastName)
+      .input('email_id', dbTypes.VarChar(255), this.emailId)
+      .input('mobile_no', dbTypes.VarChar(10), this.mobileNumber)
+      .input('dob', dbTypes.Date, this.dob)
+      .input('title', dbTypes.VarChar(5), this.title)
+      .input('password', dbTypes.VarChar(255), this.password)
+      .input('role_id', dbTypes.Int, this.roleId)
+      .input('profile_approved', dbTypes.Bit, false)
+      .input('gender', dbTypes.VarChar(10), this.gender)
       .query(queryStmt);
     }
     catch(err) {
@@ -57,7 +56,7 @@ module.exports = class User {
     const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE email_id = @email_id`;
     try {
       return await db.request()
-      .input('email_id', types.VarChar(255), emailId)
+      .input('email_id', dbTypes.VarChar(255), emailId)
       .query(queryStmt);
     }
     catch(err){
@@ -70,7 +69,7 @@ module.exports = class User {
     const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE user_id = @user_id`;
     try {
       return await db.request()
-      .input('user_id', types.Int, user_id)
+      .input('user_id', dbTypes.Int, user_id)
       .query(queryStmt);
     }
     catch(err){
@@ -83,8 +82,8 @@ module.exports = class User {
     const queryStmt = `UPDATE ${tableNames.USERS} SET profile_approved=@profile_approved WHERE user_id = @user_id`;
     try {
       return await db.request()
-      .input('profile_approved',types.Bit,profile_approved)
-      .input('user_id', types.Int, user_id)
+      .input('profile_approved',dbTypes.Bit,profile_approved)
+      .input('user_id', dbTypes.Int, user_id)
       .query(queryStmt);
     }
     catch(err){
@@ -100,7 +99,7 @@ module.exports = class User {
     const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE mobile_no = @mobile_no`;
     try {
       return await db.request()
-      .input('mobile_no', types.VarChar(10), mobileNo)
+      .input('mobile_no', dbTypes.VarChar(10), mobileNo)
       .query(queryStmt);
     }
     catch(err) {

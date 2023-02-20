@@ -128,13 +128,9 @@ create table questions (
 );
 GO
 
---workshop table
-IF OBJECT_ID(N'workshops', N'U') is null
-create table workshops (
-	workshop_id int IDENTITY(1,1),
-	coordinator_id int NOT NULL,
-	co_coordinator_id int NOT NULL,
-	institute_id int NOT NULL,  
+IF OBJECT_ID(N'workshop_details', N'U') is NULL
+create table workshop_details (
+	id int IDENTITY(1, 1),
 	area_specialization_id int NOT NULL,
 	sub_area varchar (50),
 	title varchar (100) NOT NULL,
@@ -148,12 +144,26 @@ create table workshops (
 	quiz_generated BIT default 0,
 	quiz_id int,
 	workshop_completed BIT default 0,
-	PRIMARY KEY (workshop_id),
+	PRIMARY KEY (id),
 	FOREIGN KEY (area_specialization_id) REFERENCES workshop_specializations(id),
-	FOREIGN KEY (coordinator_id) REFERENCES coordinator_details(id),
+	FOREIGN KEY (quiz_id) REFERENCES quizes(id)
+);
+GO
+
+--workshop table
+IF OBJECT_ID(N'workshops', N'U') is null
+create table workshops (
+	workshop_id int IDENTITY(1,1),
+	coordinator_id int,
+	co_coordinator_id int,
+	institute_id int,  
+	workshop_details_id int,
+	draft BIT default 1,
+	PRIMARY KEY (workshop_id),
+	FOREIGN KEY (coordinator_id) REFERENCES users(user_id),
 	FOREIGN KEY (co_coordinator_id) REFERENCES users(user_id),
 	FOREIGN KEY (institute_id) REFERENCES institute_details(id),
-	FOREIGN KEY (quiz_id) REFERENCES quizes(id)
+	FOREIGN KEY (workshop_details_id) REFERENCES workshop_details(id)
 );
 GO
 

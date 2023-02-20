@@ -1,5 +1,5 @@
-exports.tableNames = {
-    USERS: 'users',
-    ROLES: 'roles',
-    USERDOCS: 'user_docs'
+exports.roles = {
+    COORDINATOR: 'coordinator',
+    ADMINISTRATOR: 'administrator',
+    PARTICIPANT: 'participant'
 };

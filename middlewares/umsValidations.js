@@ -1,4 +1,4 @@
-const { body, validationResult } = require("express-validator");
+const { body } = require("express-validator");
 
 const User = require("../models/user");
 const Roles = require("../models/roles");
@@ -142,27 +142,6 @@ exports.signupValidationRules = () => {
     ];
 };
 
-exports.AuthenticationValidation = (req, res, next) => {
-    const errors = validationResult(req);
-    if(!errors.isEmpty()){
-        const errs =  errors.array().map(error => {
-            if(typeof(error.msg) == "object"){
-                return {
-                    msg: error.msg.errorMsg,
-                    status: error.msg.status,
-                }
-            }
-            return {    
-                msg: error.msg,
-                status: 422,
-            }
-        });
-        return res.status(400).json({errors: errs});
-    }
-    next();
-};
-
-
 exports.loginValidationRules=()=>{
     return [
         body('email_id')
@@ -176,17 +155,17 @@ exports.loginValidationRules=()=>{
             try{
                 const result = await User.findUserByEmail(emailId);
                 if(result.recordset.length < 1)
-                    return Promise.reject(
-                        {
-                            errorMsg: "Email is Incorrect",
-                            status: 400
-                        }
-                    );           
-            }
-            catch(err){
                 return Promise.reject(
-                    { 
-                        errorMsg: err.msg, 
+                    {
+                        errorMsg: "Email is Incorrect",
+                        status: 400
+                    }
+                    );           
+                }
+                catch(err){
+                    return Promise.reject(
+                        { 
+                            errorMsg: err.msg, 
                         status: err.status
                     }
                 );
@@ -194,13 +173,11 @@ exports.loginValidationRules=()=>{
         })
         ,
         body("password")
-            .exists()
-            .withMessage("Password is required!")
-            
+        .exists()
+        .withMessage("Password is required!")
+        
     ]
-}
-
-
+};
 
 exports.uploadFilesValidationRules = () => {
     return [
@@ -210,20 +187,6 @@ exports.uploadFilesValidationRules = () => {
             .bail()
             .isEmail()
             .withMessage("Invalid Email")
-        ,
     ];
 };
 
-exports.uploadFilesValidation = (req, res, next) => {
-    const errors = validationResult(req);
-    if(!errors.isEmpty()){
-        const errs =  errors.array().map(error => {
-            return {    
-                msg: error.msg,
-                status: 422,
-            }
-        });
-        return res.status(400).json({errors: errs});
-    }
-    next();
-};

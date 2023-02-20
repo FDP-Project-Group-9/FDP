@@ -2,8 +2,8 @@ const fs = require('fs');
 const bycrypt = require('bcrypt');
 const jwt=require('jsonwebtoken')
 const User = require('../models/user');
-const UserDocs = require("../models/user_docs");
-const { throwError } = require('../utils/utilFunctions');
+const UserDocs = require("../models/userDocs");
+const { throwError } = require('../utils/utils');
 const { emailGenerator } = require('../utils/email');
 
 exports.signup = ( async (req, res, next) => {

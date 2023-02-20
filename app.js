@@ -11,6 +11,7 @@ const passport=require('passport')
 require('dotenv').config();
 
 const onBoardingRoutes = require('./routes/ums');
+const workshopRoutes = require('./routes/workshop');
 
 const { connectDB } = require('./config/db');
 const { passportMiddleware } = require('./middlewares/passport');
@@ -63,7 +64,11 @@ app.use((req, res, next) => {
 })
 
 // Use Routes
+// user management routes
 app.use('/ums', upload.array("docs"), onBoardingRoutes);
+
+// workshop routes
+app.use('/workshop', workshopRoutes);
 
 // error handler
 app.use((error, req, res, next) => {
