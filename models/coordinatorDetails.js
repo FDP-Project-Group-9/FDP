@@ -1,6 +1,7 @@
 const { getDB } = require("../config/db");
-const { tableNames, dbTypes, throwError } = require("../utils/utils");
+const { dbTypes, throwError } = require("../utils/helper");
 const { colNames } = require("../utils/constants").coordinator_details;
+const { tableNames } = require("../utils/constants");
 
 module.exports = class CoordinatorDetails {
     constructor (data){
@@ -24,6 +25,7 @@ module.exports = class CoordinatorDetails {
             ${colNames.specializationId}, 
             ${colNames.experience}
         )
+        OUTPUT INSERTED.id
         VALUES 
         (
             ${'@' + colNames.coordinatorId},
@@ -101,7 +103,7 @@ module.exports = class CoordinatorDetails {
     static async findDetails(coordinatorId) {
         const db = getDB();
         const queryStmt = `SELECT 
-            ${tableNames.COORDINATOR_DETAILS}.id,
+            ${colNames.coordinatorId},
             ${colNames.fatherName},
             ${colNames.alternateEmailId},
             ${colNames.whatsappNo},
@@ -112,7 +114,8 @@ module.exports = class CoordinatorDetails {
             ${colNames.empId},
             ${colNames.designation},
             ${colNames.specializationId}, 
-            ${colNames.experience}
+            ${colNames.experience},
+            ${tableNames.WORKSHOP_SPECIALIZATION}.specialization
             FROM ${tableNames.COORDINATOR_DETAILS}
             INNER JOIN ${tableNames.WORKSHOP_SPECIALIZATION}
             ON ${tableNames.COORDINATOR_DETAILS}.specialization_id = ${tableNames.WORKSHOP_SPECIALIZATION}.id AND coordinator_id = @coordinator_id`;

@@ -1,8 +1,9 @@
 const sql = require('mssql');
 
 const { getDB } = require('../config/db');
-const { dbTypes, tableNames, throwError } = require('../utils/utils'); 
-
+const { dbTypes, throwError } = require('../utils/helper'); 
+const { tableNames } = require("../utils/constants");
+ 
 module.exports = class UserDocs {
     static async addDocumentsForUser(userId, files) {
         const db = getDB();

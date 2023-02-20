@@ -3,7 +3,7 @@ const bycrypt = require('bcrypt');
 const jwt=require('jsonwebtoken')
 const User = require('../models/user');
 const UserDocs = require("../models/userDocs");
-const { throwError } = require('../utils/utils');
+const { throwError } = require('../utils/helper');
 const { emailGenerator } = require('../utils/email');
 
 exports.signup = ( async (req, res, next) => {

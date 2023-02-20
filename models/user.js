@@ -1,5 +1,6 @@
 const { getDB } = require('../config/db');
-const { dbTypes, tableNames, throwError } = require('../utils/utils');
+const { dbTypes, throwError } = require('../utils/helper');
+const { tableNames } = require("../utils/constants");
 
 module.exports = class User {
 
@@ -18,7 +19,19 @@ module.exports = class User {
 
   async save () {
     const db = getDB();
-    const queryStmt = `INSERT INTO ${tableNames.USERS} (first_name, last_name, email_id,mobile_no, dob,title,password,role_id,profile_approved,gender) 
+    const queryStmt = `INSERT INTO ${tableNames.USERS} 
+    (
+      first_name,
+      last_name, 
+      email_id,
+      mobile_no, 
+      dob,
+      title,
+      password,
+      role_id,
+      profile_approved,
+      gender
+    ) 
     values(
       @first_name, 
       @last_name, 
@@ -53,7 +66,22 @@ module.exports = class User {
 
   static async findUserByEmail(emailId) {
     const db = getDB();
-    const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE email_id = @email_id`;
+    const queryStmt = `SELECT 
+      user_id,
+      first_name,
+      last_name, 
+      email_id,
+      mobile_no, 
+      dob,
+      title,
+      password,
+      ${tableNames.USERS}.role_id,
+      profile_approved,
+      gender,
+      role_name
+    FROM ${tableNames.USERS} 
+    INNER JOIN ${tableNames.ROLES}
+    ON ${tableNames.USERS}.role_id = ${tableNames.ROLES}.role_id AND email = @email_id`;
     try {
       return await db.request()
       .input('email_id', dbTypes.VarChar(255), emailId)
@@ -66,7 +94,22 @@ module.exports = class User {
 
   static async findUserById(user_id) {
     const db = getDB();
-    const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE user_id = @user_id`;
+    const queryStmt = `SELECT 
+      user_id,
+      first_name,
+      last_name, 
+      email_id,
+      mobile_no, 
+      dob,
+      title,
+      password,
+      ${tableNames.USERS}.role_id,
+      profile_approved,
+      gender,
+      role_name
+    FROM ${tableNames.USERS} 
+    INNER JOIN ${tableNames.ROLES}
+    ON ${tableNames.USERS}.role_id = ${tableNames.ROLES}.role_id AND user_id = @user_id`;
     try {
       return await db.request()
       .input('user_id', dbTypes.Int, user_id)

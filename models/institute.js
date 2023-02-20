@@ -1,15 +1,16 @@
 const { getDB } = require("../config/db");
-const { tableNames, dbTypes, throwError } = require("../utils/utils");
+const { dbTypes, throwError } = require("../utils/helper");
 const { colNames } = require("../utils/constants").institute_details;
+const { tableNames } = require("../utils/constants");
 
-module.exports = class InstituteDetails {
+module.exports = class Institute {
     constructor(data){
         Object.assign(this, data);
     };
 
     async addInstituteDetails() {
         const db = getDB();
-        const queryStmt = `INSERT INTO ${tableNames.INSTITUTE_DETAILS}
+        const queryStmt = `INSERT INTO ${tableNames.INSTITUTE}
         (
             ${colNames.coordinator_id},
             ${colNames.aicteApproved},
@@ -20,6 +21,7 @@ module.exports = class InstituteDetails {
             ${colNames.stateName},
             ${colNames.districtName}
         )
+        OUTPUT INSERTED.id
         VALUES 
         (
             ${'@' + colNames.coordinator_id},
@@ -52,7 +54,7 @@ module.exports = class InstituteDetails {
 
     static async updateDetails(data) {
         const db = getDB();
-        const queryStmt = `UPDATE ${tableNames.INSTITUTE_DETAILS} SET
+        const queryStmt = `UPDATE ${tableNames.INSTITUTE} SET
         ${colNames.aicteApproved} = ${'@' + colNames.aicteApproved},
         ${colNames.pid} = ${'@' + colNames.pid},
         ${colNames.instituteType} = ${'@' + colNames.instituteType},
@@ -81,11 +83,25 @@ module.exports = class InstituteDetails {
 
     static async findDetails(coordinatorId) {
         const db = getDB();
-        const queryStmt = `SELECT * from ${tableNames.INSTITUTE_DETAILS} WHERE coordinator_id = @coordinator_id`;
+        const queryStmt = `SELECT * from ${tableNames.INSTITUTE} WHERE coordinator_id = @coordinator_id`;
 
         try{
             return await db.request()
             .input('coordinator_id', dbTypes.Int, coordinatorId)
+            .query(queryStmt);
+        }
+        catch(err){
+            throwError(err.originalError.info.message, 500);
+        }
+    };
+
+    static async findDetailsById(instituteId) {
+        const db = getDB();
+        const queryStmt = `SELECT * from ${tableNames.INSTITUTE} WHERE id = @institute_id`;
+
+        try{
+            return await db.request()
+            .input('institute_id', dbTypes.Int, instituteId)
             .query(queryStmt);
         }
         catch(err){

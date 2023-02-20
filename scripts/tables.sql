@@ -89,8 +89,8 @@ create table coordinator_details (
 GO
 
 -- institute details table
-IF OBJECT_ID(N'institute_details', N'U') is null
-create table institute_details (
+IF OBJECT_ID(N'institute', N'U') is null
+create table institute (
 	id int IDENTITY(1,1),
 	coordinator_id int NOT NULL,
 	aicte_approved BIT,
@@ -133,11 +133,12 @@ GO
 IF OBJECT_ID(N'workshop_details', N'U') is NULL
 create table workshop_details (
 	id int IDENTITY(1, 1),
+	workshop_id int NOT NULL,
 	area_specialization_id int NOT NULL,
 	sub_area varchar (50),
 	title varchar (100) NOT NULL,
 	begin_date date NOT NULL,
-	end_data date NOT NULL,
+	end_date date NOT NULL,
 	mode varchar (50) NOT NULL, --specifies the mode i.e online or offline
 	participant_intake int NOT NULL,
 	workshop_approval_status BIT DEFAULT 0,
@@ -148,7 +149,7 @@ create table workshop_details (
 	workshop_completed BIT default 0,
 	PRIMARY KEY (id),
 	FOREIGN KEY (area_specialization_id) REFERENCES workshop_specializations(id),
-	FOREIGN KEY (quiz_id) REFERENCES quizes(id)
+	FOREIGN KEY (quiz_id) REFERENCES quizes(id),
 );
 GO
 
@@ -165,8 +166,15 @@ create table workshops (
 	FOREIGN KEY (coordinator_id) REFERENCES users(user_id),
 	FOREIGN KEY (co_coordinator_id) REFERENCES users(user_id),
 	FOREIGN KEY (institute_id) REFERENCES institute_details(id),
-	FOREIGN KEY (workshop_details_id) REFERENCES workshop_details(id)
 );
+GO
+
+ALTER TABLE workshop_details 
+ADD FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id);
+GO
+
+ALTER TABLE workshops
+ADD FOREIGN KEY (workshop_details_id) REFERENCES workshop_details(id);
 GO
 
 --attendace table

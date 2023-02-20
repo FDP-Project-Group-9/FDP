@@ -9,16 +9,6 @@ exports.dbTypes = {
     Bit: sql.Bit,
 };
 
-exports.tableNames = {
-    USERS: 'users',
-    ROLES: 'roles',
-    USERDOCS: 'user_docs',
-    WORKSHOP: 'workshops',
-    WORKSHOP_SPECIALIZATION: 'workshop_specializations',
-    COORDINATOR_DETAILS: 'coordinator_details',
-    INSTITUTE_DETAILS: 'institute_details'
-};
-
 exports.throwError = (message, status) => {
     const error = new Error();
     error.msg = message;

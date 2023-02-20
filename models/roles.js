@@ -1,5 +1,6 @@
 const { getDB } = require('../config/db');
-const { dbTypes, tableNames, throwError } = require('../utils/utils');
+const { dbTypes, throwError } = require('../utils/helper');
+const { tableNames } = require("../utils/constants");
 
 module.exports = class Roles {
   static async findRole(roleId){

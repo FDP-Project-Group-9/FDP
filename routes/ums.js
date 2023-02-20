@@ -6,7 +6,7 @@ const {
     uploadFilesValidationRules,
     loginValidationRules,
 } = require('../middlewares/umsValidations');
-const { validationErrorHandler } = require("../utils/utils");
+const { validationErrorHandler } = require("../utils/helper");
 
 //creating routes object
 const routes = express.Router();
