@@ -13,7 +13,9 @@ exports.tableNames = {
     USERS: 'users',
     ROLES: 'roles',
     USERDOCS: 'user_docs',
-    WORKSHOP: 'workshops'
+    WORKSHOP: 'workshops',
+    WORKSHOP_SPECIALIZATION: 'workshop_specializations',
+    COORDINATOR_DETAILS: 'coordinator_details'
 };
 
 exports.throwError = (message, status) => {

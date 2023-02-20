@@ -1,17 +1,21 @@
 const express = require('express');
 const {
     getWorkshopDraft,
-    createWorkshopDraft
+    createWorkshopDraft,
+    putCoordinatorDetails
 } = require('../controllers/createWorkshop');
 
-const { verifyUserRole } = require("../middlewares/workshopAuthorization");
 const { validationErrorHandler } = require("../utils/utils");
-const { createWorkshopValidationRules } = require("../middlewares/workshopValidations");
+const {
+     addCoordinatorDetailsValidations 
+} = require("../middlewares/workshopCreationValidations");
 
 const routes = express.Router();
 
-routes.post("/create-draft", createWorkshopValidationRules(), validationErrorHandler, verifyUserRole, createWorkshopDraft);
+routes.post("/draft", createWorkshopDraft);
 
-routes.get("/get-draft", getWorkshopDraft);
+routes.get("/draft", getWorkshopDraft);
+
+routes.put("/coordinator-details", addCoordinatorDetailsValidations(), validationErrorHandler, putCoordinatorDetails);
 
 module.exports = routes;

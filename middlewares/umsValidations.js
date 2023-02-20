@@ -106,7 +106,7 @@ exports.signupValidationRules = () => {
                             errorMsg: err.msg,
                             status: err.status
                         }
-                    )
+                    );
                 }
             })
         ,

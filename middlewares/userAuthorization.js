@@ -3,7 +3,7 @@ const Role = require("../models/roles");
 const { roles } = require("../utils/constants");
 const { throwError } = require("../utils/utils");
 
-exports.verifyUserRole = async (req, res, next) => {
+exports.verifyCoordinatorRole = async (req, res, next) => {
     const user = res.locals.user;
     try {
         const result = await Role.findRole(user['role_id']);

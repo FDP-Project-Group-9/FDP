@@ -14,7 +14,7 @@ const onBoardingRoutes = require('./routes/ums');
 const workshopRoutes = require('./routes/workshop');
 
 const { connectDB } = require('./config/db');
-const { passportMiddleware } = require('./middlewares/passport');
+const { passportMiddleware, authenticateJWT } = require('./middlewares/passport');
 
 const port = process.env.PORT || 5000;
 const app = express();
@@ -68,7 +68,7 @@ app.use((req, res, next) => {
 app.use('/ums', upload.array("docs"), onBoardingRoutes);
 
 // workshop routes
-app.use('/workshop', workshopRoutes);
+app.use('/workshop', authenticateJWT, workshopRoutes);
 
 // error handler
 app.use((error, req, res, next) => {

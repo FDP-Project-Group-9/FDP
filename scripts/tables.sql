@@ -72,7 +72,7 @@ create table coordinator_details (
 	id int IDENTITY(1,1),
 	coordinator_id int NOT NULL, 
 	father_name varchar (50) NOT NULL,
-	alternate_email_id varchar (255) NOT NULL,
+	alternate_email_id varchar (255),
 	whatsapp_no varchar (10),
 	state_name varchar (50),
 	district_name varchar (50),

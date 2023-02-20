@@ -40,11 +40,6 @@ exports.authenticateJWT = async (req, res, next) => {
         next({msg: "Authentication failed, User not found", status: 401});
       }
       
-      //check whether the user id in jwt is the same as in the request body
-      if(user['user_id'] != req.body['user_id']){
-        next({msg: "Unauthorized user, jwt token and user id don't match!", status: 403});
-      }
-
       resolve(user);
     })(req, res, next);
   });

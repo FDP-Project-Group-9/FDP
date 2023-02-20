@@ -33,5 +33,10 @@ module.exports = class Workshop {
         catch(err){
             throwError(err.originalError.info.message, 500);
         }
+    };
+
+    static async getWorkshopDetails(workshopId) {
+        // const db = getDB();
+        // const queryStmt = ``
     }
 };
