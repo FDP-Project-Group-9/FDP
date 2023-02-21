@@ -12,7 +12,8 @@ exports.tableNames = {
     WORKSHOP_SPECIALIZATION: 'workshop_specializations',
     COORDINATOR_DETAILS: 'coordinator_details',
     INSTITUTE: 'institute',
-    WORKSHOP_DETAILS: 'workshop_details'
+    WORKSHOP_DETAILS: 'workshop_details',
+    TWILIO: 'twilio',
 };
 
 exports.workshop = {
@@ -22,7 +23,8 @@ exports.workshop = {
         coCoordinatorId: 'co_coordinator_id',
         instituteId: 'institute_id',
         workshopDetailsId: 'workshop_details_id',
-        draft: 'draft'
+        draft: 'draft',
+        otpVerified: 'otp_verified'
     }
 };
 
@@ -72,5 +74,12 @@ exports.workshop_details = {
         quizGenerated: 'quiz_generated',
         quizId: 'quiz_id',
         workshopCompleted: 'workshop_completed'
+    }
+};
+
+exports.twilio = {
+    colNames: {
+        id: 'id',
+        sid: 'sid'
     }
 };

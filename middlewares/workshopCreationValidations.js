@@ -183,7 +183,7 @@ exports.workshopDetailsValidations = () => {
 };
 
 
-exports.createWorkshopValidations = () => {
+exports.workshopIdValidation = () => {
     return [
         body("workshop_id")
             .exists()

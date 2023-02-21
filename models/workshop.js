@@ -82,4 +82,22 @@ module.exports = class Workshop {
         }
     };
 
+    static async updateOPTVerification(workshopId) {
+        const db = getDB();
+        const queryStmt =  `UPDATE ${tableNames.WORKSHOP}
+        SET
+        ${colNames.otpVerified} = ${'@' + colNames.otpVerified}
+        WHERE ${colNames.workshopId} = ${'@' + colNames.workshopId}`;
+
+        try{
+            return await db.request()
+            .input(colNames.otpVerified, dbTypes.Bit, true)
+            .input(colNames.workshopId, dbTypes.Int, workshopId)
+            .query(queryStmt);
+        }
+        catch(err){
+            console.log(err);
+            throwError(err.originalError.info.message, 500);
+        }
+    };
 };

@@ -7,6 +7,7 @@ const Role = require("../models/roles");
 
 const { throwError } = require("../utils/helper");
 const { roles } = require("../utils/constants");
+const { sendOTP, verifyOTP } = require("../utils/otp");
 
 exports.createWorkshopDraft = async (req, res, next) => {
     const user = res.locals.user;
@@ -324,6 +325,12 @@ exports.createWorkshop = async (req, res, next) => {
         }
 
         workshopDetails = workshopDetails.recordset[0];
+
+        // check otp verification status
+        if(!workshopDetails['otp_verified']){
+            throwError("Workshop has not been verified using otp, please verify it!", 401);
+        }
+
         if(workshopDetails['coordinator_id'] != userId){
             throwError("User is not the owner of the workshop!", 403);
         }
@@ -372,6 +379,49 @@ exports.createWorkshop = async (req, res, next) => {
         res.status(200).json({
             msg: "Workshop created successfully!"
         });
+    }
+    catch(err){
+        next(err);
+    }
+};
+
+exports.getOTP = async (req, res, next) => {
+    const user = res.locals.user;
+    const mobileNo = user['mobile_no'];
+    try{
+        await sendOTP(mobileNo);
+        res.status(200).json({
+            msg: "OTP Sent to registered mobile number successfully!"
+        });
+    }
+    catch(err){
+        next(err);
+    }
+};
+
+exports.verifyOTP = async (req, res, next) => {
+    const user = res.locals.user;
+    const mobileNo = user['mobile_no'];
+    const otp = req.body.otp;
+    const workshopId = req.body['workshop_id'];
+
+    try {
+        const result = await verifyOTP(mobileNo, otp);
+        if(result.valid){
+            const update = await Workshop.updateOPTVerification(workshopId);
+            if(update.rowsAffected[0] == 0){
+                throwError("Workshop not found!", 404);
+            }
+
+            res.status(200).json({
+                msg: "OTP verified!"
+            });
+        }
+        else{
+            res.status(401).json({
+                msg: "Invlaid otp!"
+            });
+        }
     }
     catch(err){
         next(err);
