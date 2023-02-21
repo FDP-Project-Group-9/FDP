@@ -3,3 +3,8 @@
   - DB_USER='user name'
   - DB_PASSWORD='password'
   - DB_NAME='database name'
+  - MAIL_SENDER_EMAILID='sender email id'
+  - EMAIL_PASSWORD='email password'
+  - SECRET_KEY='some secret'
+  - TWILIO_ACCOUNT_SID='account sid'
+  - TWILIO_AUTH_TOKEN='auth token'
