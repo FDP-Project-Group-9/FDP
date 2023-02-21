@@ -167,6 +167,7 @@ create table workshops (
 	institute_id int,  
 	workshop_details_id int,
 	draft BIT default 1,
+	otp_verified BIT default 0,
 	PRIMARY KEY (workshop_id),
 	FOREIGN KEY (coordinator_id) REFERENCES users(user_id),
 	FOREIGN KEY (co_coordinator_id) REFERENCES users(user_id),
@@ -217,5 +218,12 @@ create table workshop_participants (
 	FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id),
 	FOREIGN KEY (participant_id) REFERENCES users(user_id),
 	FOREIGN KEY (attendance_id) REFERENCES attendance(id)
+);
+GO
+
+IF OBJECT_ID(N'twilio', N'U') is NULL
+CREATE TABLE twilio (
+	id int IDENTITY(1, 1),
+	sid varchar(255) NOT NULL
 );
 GO
