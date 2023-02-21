@@ -37,7 +37,7 @@ exports.authenticateJWT = async (req, res, next) => {
 
       //check if there is no user for the user id extracted from jwt token
       if(!user){
-        next({msg: "Authentication failed, User not found", status: 401});
+        next({msg: "Authentication failed, User not found or token has expired!", status: 401});
       }
       
       resolve(user);

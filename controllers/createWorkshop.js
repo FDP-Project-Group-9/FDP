@@ -68,6 +68,10 @@ exports.putCoordinatorDetails = async (req, res, next) => {
             if(role.toLowerCase() != roles.COORDINATOR){
                 throwError("User email provided for co-coordinator is not a coordinator", 403);
             }
+
+            if(!coCoordinatorId.recordset[0]['profile_approved']){
+                throwError("Co-coordinator profile is not approved!", 403);
+            }
             coCoordinatorId = coCoordinatorId.recordset[0]['user_id'];
         }
         catch(err){

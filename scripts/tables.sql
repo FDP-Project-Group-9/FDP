@@ -5,7 +5,12 @@ create table roles (
 	role_name varchar(20) NOT NULL
 	primary key(role_id)
 );
+INSERT INTO roles VALUES 
+('administrator'),
+('coordinator'),
+('participant');
 GO
+
 
 IF OBJECT_ID(N'users', N'U') is null
 create table users (
@@ -165,7 +170,7 @@ create table workshops (
 	PRIMARY KEY (workshop_id),
 	FOREIGN KEY (coordinator_id) REFERENCES users(user_id),
 	FOREIGN KEY (co_coordinator_id) REFERENCES users(user_id),
-	FOREIGN KEY (institute_id) REFERENCES institute_details(id),
+	FOREIGN KEY (institute_id) REFERENCES institute(id),
 );
 GO
 

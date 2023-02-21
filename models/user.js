@@ -4,7 +4,7 @@ const { tableNames } = require("../utils/constants");
 
 module.exports = class User {
 
-  constructor(roleId, firstName, lastName, title, dob, gender, emailId, mobileNumber, password){
+  constructor(roleId, firstName, lastName, title, dob, gender, emailId, mobileNumber, password, profile_approved){
     this.roleId = roleId;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -14,6 +14,7 @@ module.exports = class User {
     this.emailId = emailId;
     this.mobileNumber = mobileNumber;
     this.password = password;
+    this.profile_approved = profile_approved;
   }
 
 
@@ -55,7 +56,7 @@ module.exports = class User {
       .input('title', dbTypes.VarChar(5), this.title)
       .input('password', dbTypes.VarChar(255), this.password)
       .input('role_id', dbTypes.Int, this.roleId)
-      .input('profile_approved', dbTypes.Bit, false)
+      .input('profile_approved', dbTypes.Bit, this.profile_approved)
       .input('gender', dbTypes.VarChar(10), this.gender)
       .query(queryStmt);
     }
@@ -81,7 +82,7 @@ module.exports = class User {
       role_name
     FROM ${tableNames.USERS} 
     INNER JOIN ${tableNames.ROLES}
-    ON ${tableNames.USERS}.role_id = ${tableNames.ROLES}.role_id AND email = @email_id`;
+    ON ${tableNames.USERS}.role_id = ${tableNames.ROLES}.role_id AND email_id = @email_id`;
     try {
       return await db.request()
       .input('email_id', dbTypes.VarChar(255), emailId)

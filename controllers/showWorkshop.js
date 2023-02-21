@@ -4,6 +4,8 @@ const Institute = require("../models/institute");
 const WorkshopDetails = require("../models/workshopDetails");
 const User = require("../models/user");
 
+const { throwError } = require("../utils/helper");
+
 exports.getWorkshopDetails = async (req, res, next) => {
     const workshopId = req.params['workshop_id'];
     const responseData = {
@@ -16,19 +18,14 @@ exports.getWorkshopDetails = async (req, res, next) => {
 
     //find the details of the workshop
     try{
+        let result;
         workshopDetails = await Workshop.getWorkshopDetails(workshopId);
         if(workshopDetails.recordset.length == 0){
             throwError("Workshop not found!", 404);
         }
         workshopDetails = workshopDetails.recordset[0];
         responseData.draft = workshopDetails['draft'];
-    }
-    catch(err){
-        next(err);
-    }
 
-    try{
-        let result;
         //find the details of coordinator from coordinator_details table
         const coordinatorId = workshopDetails['coordinator_id'];
         result = await CoordinatorDetails.findDetails(coordinatorId);

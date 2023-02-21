@@ -11,11 +11,11 @@ const routes = express.Router();
 // routes for creating workshop
 routes.use("/create-workshop", verifyCoordinatorRole, createWorkshopRoutes);
 
-//get workshop details
-routes.get("/:workshop_id", getWorkshopDetails);
-
 // workshop specializations routes
 routes.post("/specialization", verifyCoordinatorRole, addWorkshopSpecializationValidations(), validationErrorHandler, addWorkshopSpecialization);
 routes.get("/specializations", verifyCoordinatorRole, getWorkshopSpecializations);
+
+//get workshop details
+routes.get("/:workshop_id", getWorkshopDetails);
 
 module.exports = routes;
