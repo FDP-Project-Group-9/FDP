@@ -5,7 +5,12 @@ create table roles (
 	role_name varchar(20) NOT NULL
 	primary key(role_id)
 );
+INSERT INTO roles VALUES 
+('administrator'),
+('coordinator'),
+('participant');
 GO
+
 
 IF OBJECT_ID(N'users', N'U') is null
 create table users (
@@ -72,7 +77,7 @@ create table coordinator_details (
 	id int IDENTITY(1,1),
 	coordinator_id int NOT NULL, 
 	father_name varchar (50) NOT NULL,
-	alternate_email_id varchar (255) NOT NULL,
+	alternate_email_id varchar (255),
 	whatsapp_no varchar (10),
 	state_name varchar (50),
 	district_name varchar (50),
@@ -89,9 +94,10 @@ create table coordinator_details (
 GO
 
 -- institute details table
-IF OBJECT_ID(N'institute_details', N'U') is null
-create table institute_details (
+IF OBJECT_ID(N'institute', N'U') is null
+create table institute (
 	id int IDENTITY(1,1),
+	coordinator_id int NOT NULL,
 	aicte_approved BIT,
 	pid int,
 	institute_type varchar (30) NOT NULL,
@@ -99,7 +105,8 @@ create table institute_details (
 	institute_address varchar (255) NOT NULL,
 	state_name varchar (50),
 	district_name varchar (50),
-	PRIMARY KEY (id)
+	PRIMARY KEY (id),
+	FOREIGN KEY(coordinator_id) REFERENCES users(user_id)
 );
 GO
 
@@ -128,18 +135,15 @@ create table questions (
 );
 GO
 
---workshop table
-IF OBJECT_ID(N'workshops', N'U') is null
-create table workshops (
-	workshop_id int IDENTITY(1,1),
-	coordinator_id int NOT NULL,
-	co_coordinator_id int NOT NULL,
-	institute_id int NOT NULL,  
+IF OBJECT_ID(N'workshop_details', N'U') is NULL
+create table workshop_details (
+	id int IDENTITY(1, 1),
+	workshop_id int NOT NULL,
 	area_specialization_id int NOT NULL,
 	sub_area varchar (50),
 	title varchar (100) NOT NULL,
 	begin_date date NOT NULL,
-	end_data date NOT NULL,
+	end_date date NOT NULL,
 	mode varchar (50) NOT NULL, --specifies the mode i.e online or offline
 	participant_intake int NOT NULL,
 	workshop_approval_status BIT DEFAULT 0,
@@ -148,13 +152,34 @@ create table workshops (
 	quiz_generated BIT default 0,
 	quiz_id int,
 	workshop_completed BIT default 0,
-	PRIMARY KEY (workshop_id),
+	PRIMARY KEY (id),
 	FOREIGN KEY (area_specialization_id) REFERENCES workshop_specializations(id),
-	FOREIGN KEY (coordinator_id) REFERENCES coordinator_details(id),
-	FOREIGN KEY (co_coordinator_id) REFERENCES users(user_id),
-	FOREIGN KEY (institute_id) REFERENCES institute_details(id),
-	FOREIGN KEY (quiz_id) REFERENCES quizes(id)
+	FOREIGN KEY (quiz_id) REFERENCES quizes(id),
 );
+GO
+
+--workshop table
+IF OBJECT_ID(N'workshops', N'U') is null
+create table workshops (
+	workshop_id int IDENTITY(1,1),
+	coordinator_id int,
+	co_coordinator_id int,
+	institute_id int,  
+	workshop_details_id int,
+	draft BIT default 1,
+	PRIMARY KEY (workshop_id),
+	FOREIGN KEY (coordinator_id) REFERENCES users(user_id),
+	FOREIGN KEY (co_coordinator_id) REFERENCES users(user_id),
+	FOREIGN KEY (institute_id) REFERENCES institute(id),
+);
+GO
+
+ALTER TABLE workshop_details 
+ADD FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id);
+GO
+
+ALTER TABLE workshops
+ADD FOREIGN KEY (workshop_details_id) REFERENCES workshop_details(id);
 GO
 
 --attendace table

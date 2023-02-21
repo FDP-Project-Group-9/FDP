@@ -1,10 +1,10 @@
 const { getDB } = require('../config/db');
-const { types } = require('../utils/dbTypes');
-const { throwError } = require('../utils/utilFunctions');
-const { tableNames } = require('../utils/constants');
+const { dbTypes, throwError } = require('../utils/helper');
+const { tableNames } = require("../utils/constants");
+
 module.exports = class User {
 
-  constructor(roleId, firstName, lastName, title, dob, gender, emailId, mobileNumber, password){
+  constructor(roleId, firstName, lastName, title, dob, gender, emailId, mobileNumber, password, profile_approved){
     this.roleId = roleId;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -14,12 +14,25 @@ module.exports = class User {
     this.emailId = emailId;
     this.mobileNumber = mobileNumber;
     this.password = password;
+    this.profile_approved = profile_approved;
   }
 
 
   async save () {
     const db = getDB();
-    const queryStmt = `INSERT INTO ${tableNames.USERS} (first_name, last_name, email_id,mobile_no, dob,title,password,role_id,profile_approved,gender) 
+    const queryStmt = `INSERT INTO ${tableNames.USERS} 
+    (
+      first_name,
+      last_name, 
+      email_id,
+      mobile_no, 
+      dob,
+      title,
+      password,
+      role_id,
+      profile_approved,
+      gender
+    ) 
     values(
       @first_name, 
       @last_name, 
@@ -35,16 +48,16 @@ module.exports = class User {
 
     try {
       return await db.request()
-      .input('first_name', types.VarChar(30), this.firstName)
-      .input('last_name', types.VarChar(30), this.lastName)
-      .input('email_id', types.VarChar(255), this.emailId)
-      .input('mobile_no', types.VarChar(10), this.mobileNumber)
-      .input('dob', types.Date, this.dob)
-      .input('title', types.VarChar(5), this.title)
-      .input('password', types.VarChar(255), this.password)
-      .input('role_id', types.Int, this.roleId)
-      .input('profile_approved', types.Bit, false)
-      .input('gender', types.VarChar(10), this.gender)
+      .input('first_name', dbTypes.VarChar(30), this.firstName)
+      .input('last_name', dbTypes.VarChar(30), this.lastName)
+      .input('email_id', dbTypes.VarChar(255), this.emailId)
+      .input('mobile_no', dbTypes.VarChar(10), this.mobileNumber)
+      .input('dob', dbTypes.Date, this.dob)
+      .input('title', dbTypes.VarChar(5), this.title)
+      .input('password', dbTypes.VarChar(255), this.password)
+      .input('role_id', dbTypes.Int, this.roleId)
+      .input('profile_approved', dbTypes.Bit, this.profile_approved)
+      .input('gender', dbTypes.VarChar(10), this.gender)
       .query(queryStmt);
     }
     catch(err) {
@@ -54,10 +67,25 @@ module.exports = class User {
 
   static async findUserByEmail(emailId) {
     const db = getDB();
-    const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE email_id = @email_id`;
+    const queryStmt = `SELECT 
+      user_id,
+      first_name,
+      last_name, 
+      email_id,
+      mobile_no, 
+      dob,
+      title,
+      password,
+      ${tableNames.USERS}.role_id,
+      profile_approved,
+      gender,
+      role_name
+    FROM ${tableNames.USERS} 
+    INNER JOIN ${tableNames.ROLES}
+    ON ${tableNames.USERS}.role_id = ${tableNames.ROLES}.role_id AND email_id = @email_id`;
     try {
       return await db.request()
-      .input('email_id', types.VarChar(255), emailId)
+      .input('email_id', dbTypes.VarChar(255), emailId)
       .query(queryStmt);
     }
     catch(err){
@@ -67,10 +95,25 @@ module.exports = class User {
 
   static async findUserById(user_id) {
     const db = getDB();
-    const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE user_id = @user_id`;
+    const queryStmt = `SELECT 
+      user_id,
+      first_name,
+      last_name, 
+      email_id,
+      mobile_no, 
+      dob,
+      title,
+      password,
+      ${tableNames.USERS}.role_id,
+      profile_approved,
+      gender,
+      role_name
+    FROM ${tableNames.USERS} 
+    INNER JOIN ${tableNames.ROLES}
+    ON ${tableNames.USERS}.role_id = ${tableNames.ROLES}.role_id AND user_id = @user_id`;
     try {
       return await db.request()
-      .input('user_id', types.Int, user_id)
+      .input('user_id', dbTypes.Int, user_id)
       .query(queryStmt);
     }
     catch(err){
@@ -83,8 +126,8 @@ module.exports = class User {
     const queryStmt = `UPDATE ${tableNames.USERS} SET profile_approved=@profile_approved WHERE user_id = @user_id`;
     try {
       return await db.request()
-      .input('profile_approved',types.Bit,profile_approved)
-      .input('user_id', types.Int, user_id)
+      .input('profile_approved',dbTypes.Bit,profile_approved)
+      .input('user_id', dbTypes.Int, user_id)
       .query(queryStmt);
     }
     catch(err){
@@ -100,7 +143,7 @@ module.exports = class User {
     const queryStmt = `SELECT * FROM ${tableNames.USERS} WHERE mobile_no = @mobile_no`;
     try {
       return await db.request()
-      .input('mobile_no', types.VarChar(10), mobileNo)
+      .input('mobile_no', dbTypes.VarChar(10), mobileNo)
       .query(queryStmt);
     }
     catch(err) {

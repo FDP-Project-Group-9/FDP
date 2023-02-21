@@ -3,21 +3,20 @@ const { authenticateJWT } = require('../middlewares/passport');
 const { signup, uploadFiles,login,userDetails,authorize } = require('../controllers/ums');
 const { 
     signupValidationRules, 
-    AuthenticationValidation,
     uploadFilesValidationRules,
-    uploadFilesValidation,
     loginValidationRules,
-} = require('../middlewares/ums');
+} = require('../middlewares/umsValidations');
+const { validationErrorHandler } = require("../utils/helper");
 
 //creating routes object
 const routes = express.Router();
 
 //creating routes for onboarding...
-routes.post("/signup", signupValidationRules(), AuthenticationValidation, signup);
+routes.post("/signup", signupValidationRules(), validationErrorHandler, signup);
 
-routes.post("/upload-files", uploadFilesValidationRules(), uploadFilesValidation, uploadFiles);
+routes.post("/upload-files", uploadFilesValidationRules(), validationErrorHandler, uploadFiles);
 
-routes.post("/login",loginValidationRules(),AuthenticationValidation,login);
+routes.post("/login",loginValidationRules(),validationErrorHandler,login);
 
 routes.get('/user-details/:id', authenticateJWT, userDetails);
 

@@ -1,15 +1,14 @@
 const { getDB } = require('../config/db');
-const { types } = require('../utils/dbTypes');
-const { throwError } = require('../utils/utilFunctions');
-const { tableNames } = require('../utils/constants');
+const { dbTypes, throwError } = require('../utils/helper');
+const { tableNames } = require("../utils/constants");
 
 module.exports = class Roles {
   static async findRole(roleId){
     const db = getDB();
-    const queryStmt = `SELECT role_id FROM ${tableNames.ROLES} WHERE role_id = @role_id`;
+    const queryStmt = `SELECT * FROM ${tableNames.ROLES} WHERE role_id = @role_id`;
     try {
         return await db.request()
-        .input('role_id', types.Int, roleId)
+        .input('role_id', dbTypes.Int, roleId)
         .query(queryStmt);  
     }
     catch(err){

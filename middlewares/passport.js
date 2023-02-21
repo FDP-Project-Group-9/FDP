@@ -2,15 +2,10 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const User = require('../models/user');
 const passport = require('passport');
-const { throwError } = require('../utils/utilFunctions');
-
-
 
 const opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = process.env.SECRET_KEY
-
-
 
 exports.passportMiddleware = (passport, next) => {
   passport.use(
@@ -18,8 +13,8 @@ exports.passportMiddleware = (passport, next) => {
       User.findUserById(jwt_payload.id)
         .then(user => {
 
-          if (user) {
-            return done(null, user);
+          if (user.recordset.length > 0) {
+            return done(null, user.recordset[0]);
           }
           return done(null, false);
         })
@@ -33,18 +28,21 @@ exports.passportMiddleware = (passport, next) => {
   next();
 };
 
-
 exports.authenticateJWT = async (req, res, next) => {
-  await new Promise((resolve, reject) => {
+  const user = await new Promise((resolve, reject) => {
     passport.authenticate('jwt', (err, user) => {
       if(err){
         next(err);
       }
+
+      //check if there is no user for the user id extracted from jwt token
       if(!user){
-        next({msg: "Authentication failed, User not found", status: 401});
+        next({msg: "Authentication failed, User not found or token has expired!", status: 401});
       }
+      
       resolve(user);
     })(req, res, next);
   });
+  res.locals.user = user;
   next();
 };
