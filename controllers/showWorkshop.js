@@ -69,3 +69,41 @@ exports.getWorkshopDetails = async (req, res, next) => {
     }
 
 };
+
+exports.getAllWorkshops = async (req, res, next) => {
+    // status can be completed, ongoing, upcoming
+    const status = req.query.status;
+    // approved could be true or false
+    const approved = req.query.approved;
+    
+    let responseData;
+  
+    try{
+        const workshops = await Workshop.getAllWorkshops(status, approved);
+        responseData = workshops.recordsets[0];
+        res.status(200).json({
+            data: responseData
+        });
+    }
+    catch(err){
+        next(err);
+    }
+};
+
+exports.getUserWorkshops = async (req, res, next) => {
+    const incomplete = req.query.incomplete;
+    const user = res.locals.user;
+    const userId = user['user_id'];
+
+    let responseData;
+    try{
+        const workshopDetails = await Workshop.getAllUserWorkshops(userId, incomplete);
+        responseData = workshopDetails.recordsets[0];
+        res.status(200).json({
+            data: responseData
+        });
+    }
+    catch(err){
+        next(err);
+    }
+};
