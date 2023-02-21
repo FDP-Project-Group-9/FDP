@@ -83,17 +83,16 @@ exports.putCoordinatorDetails = async (req, res, next) => {
     //check if the user creating/ modifying the details is the owner
     try{
         workshopInfo = await Workshop.getWorkshopDetails(workshopId);
+        if(workshopInfo.recordset.length == 0){
+            throwError("Workshop not found!", 404);
+        }
+
         workshopInfo = workshopInfo.recordset[0];
         if(workshopInfo['coordinator_id'] != userId){
             throwError("User is not the owner of the workshop!", 403);
         }
-    }
-    catch(err){
-        next(err);
-    }
 
-    //find coordinator details if it exists
-    try{
+        //find coordinator details if it exists
         details = await CoordinatorDetails.findDetails(requestData.coordinator_id);
         details = details.recordset[0];
     }
@@ -169,17 +168,16 @@ exports.putInstituteDetails = async (req, res, next) => {
     //check if the user creating/ modifying the details is the owner
     try{
         workshopInfo = await Workshop.getWorkshopDetails(workshopId);
+        if(workshopInfo.recordset.length == 0){
+            throwError("Workshop not found!", 404);
+        }
+
         workshopInfo = workshopInfo.recordset[0];
         if(workshopInfo['coordinator_id'] != userId){
             throwError("User is not the owner of the workshop!", 403);
         }
-    }
-    catch(err){
-        next(err);
-    }
 
-    // find institute details if it exists
-    try{
+        // find institute details if it exists
         details = await Institute.findDetails(userId);
         details = details.recordset[0];
     }
@@ -193,7 +191,14 @@ exports.putInstituteDetails = async (req, res, next) => {
             if(!details){
                 throwError("Details not found!", 404);
             }
-            const result = await Institute.updateDetails(requestData);
+            const institute = await Institute.updateDetails(requestData);
+            const instituteId = details['id'];
+            const data = { 
+                ...workshopInfo,
+                institute_id: instituteId, 
+                workshop_id: workshopId
+            };
+            await Workshop.updateWorkshop(data);
             res.status(200).json({
                 msg: "Insitute Details updated successfully!"
             });
@@ -245,20 +250,19 @@ exports.putWorkshopDetails = async (req, res, next) => {
 
     let details, workshopInfo;
 
-    //check if the user creating/ modifying the details is the owner
+    //check if the user creating/modifying the details is the owner
     try{
         workshopInfo = await Workshop.getWorkshopDetails(requestData.workshop_id);
+        if(workshopInfo.recordset.length == 0){
+            throwError("Workshop not found!", 404);
+        }
+
         workshopInfo = workshopInfo.recordset[0];
         if(workshopInfo['coordinator_id'] != userId){
             throwError("User is not the owner of the workshop!", 403);
         }
-    }
-    catch(err){
-        next(err);
-    }
 
-    // check if the workshop details are already there
-    try{
+        // check if the workshop details are already there
         details = await WorkshopDetails.getDetails(requestData.workshop_id);
         details = details.recordset[0];
     }
@@ -272,7 +276,7 @@ exports.putWorkshopDetails = async (req, res, next) => {
             if(!details){
                 throwError("Details not found!", 404);
             }
-            const result = await WorkshopDetails.updateDetails(requestData);
+            const workshopDetails = await WorkshopDetails.updateDetails(requestData);
             res.status(200).json({
                 msg: "Workshop details updated!"
             });
@@ -303,5 +307,73 @@ exports.putWorkshopDetails = async (req, res, next) => {
         catch(err){
             next(err);
         }
+    }
+};
+
+exports.createWorkshop = async (req, res, next) => {
+    const workshopId = req.body['workshop_id'];
+    const user = res.locals.user;
+    const userId = user['user_id'];
+    let workshopDetails;
+
+    // find the details of workshop and check whether the details are complete
+    try{
+        workshopDetails = await Workshop.getWorkshopDetails(workshopId);
+        if(workshopDetails.recordset.length == 0){
+            throwError("Workshop not found!", 404);
+        }
+
+        workshopDetails = workshopDetails.recordset[0];
+        if(workshopDetails['coordinator_id'] != userId){
+            throwError("User is not the owner of the workshop!", 403);
+        }
+        
+        // check if institute details are present 
+        if(!workshopDetails['institute_id']){
+            throwError("Insitute Details are missing!", 400);
+        }
+        else{
+            const instituteDetails = await Institute.findDetailsById(workshopDetails['institute_id']);
+            if(instituteDetails.recordset.length == 0){
+                const requestData = {...workshopDetails};
+                delete requestData['institute_details'];
+                await Workshop.updateWorkshop(requestData);
+                throwError("Insitute details not found for the corresponding institute id!", 404);
+            }
+        }
+
+        //check if workshop details are present
+        if(!workshopDetails['workshop_details_id']){
+            throwError("Workshop Details are missing!", 400);
+        }
+        else{
+            const workshopInfo = await WorkshopDetails.getDetailsById(workshopDetails['workshop_details_id']);
+            if(workshopInfo.recordset.length == 0){
+                const requestData = {...workshopDetails};
+                delete requestData['workshop_details_id'];
+                await Workshop.updateWorkshop(requestData);
+                throwError("Workshop details not found for the corresponding workshop details id!", 404);
+            }
+        }
+
+        //check co coordinator details
+        if(workshopDetails['co_coordinator_id']){
+            const coCoordinatorDetails = await User.findUserById(workshopDetails['co_coordinator_id']);
+            if(coCoordinatorDetails.recordset.length == 0){
+                const requestData = {...workshopDetails};
+                delete requestData['co_coordinator_id'];
+                await Workshop.updateWorkshop(requestData);
+                throwError("Co-Coordinator not found!", 404);
+            }
+        }
+
+        workshopDetails['draft'] = false;
+        await Workshop.updateWorkshop(workshopDetails);
+        res.status(200).json({
+            msg: "Workshop created successfully!"
+        });
+    }
+    catch(err){
+        next(err);
     }
 };

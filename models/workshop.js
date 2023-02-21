@@ -74,7 +74,7 @@ module.exports = class Workshop {
             .input(colNames.coCoordinatorId, dbTypes.Int, data[colNames.coCoordinatorId] ? data[colNames.coCoordinatorId] : null)
             .input(colNames.instituteId, dbTypes.Int, data[colNames.instituteId] ? data[colNames.instituteId] : null)
             .input(colNames.workshopDetailsId, dbTypes.Int, data[colNames.workshopDetailsId] ? data[colNames.workshopDetailsId] : null)
-            .input(colNames.draft, dbTypes.Bit, this[colNames.draft] ? data[colNames.draft] : true)
+            .input(colNames.draft, dbTypes.Bit, data[colNames.draft])
             .query(queryStmt);
         }
         catch(err){

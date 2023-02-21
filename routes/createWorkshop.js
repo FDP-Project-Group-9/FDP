@@ -3,14 +3,16 @@ const {
     createWorkshopDraft,
     putCoordinatorDetails,
     putInstituteDetails,
-    putWorkshopDetails
+    putWorkshopDetails,
+    createWorkshop
 } = require('../controllers/createWorkshop');
 
 const { validationErrorHandler } = require("../utils/helper");
 const {
      coordinatorDetailsValidations ,
      insituteDetailsValidations,
-     workshopDetailsValidations
+     workshopDetailsValidations,
+     createWorkshopValidations
 } = require("../middlewares/workshopCreationValidations");
 
 const routes = express.Router();
@@ -22,5 +24,7 @@ routes.put("/coordinator-details", coordinatorDetailsValidations(), validationEr
 routes.put("/institute-details", insituteDetailsValidations(), validationErrorHandler, putInstituteDetails);
 
 routes.put("/workshop-details", workshopDetailsValidations(), validationErrorHandler, putWorkshopDetails);
+
+routes.put("/", createWorkshopValidations(), validationErrorHandler, createWorkshop);
 
 module.exports = routes;

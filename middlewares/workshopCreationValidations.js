@@ -19,28 +19,6 @@ exports.coordinatorDetailsValidations = () => {
         body("workshop_id")
             .exists()
             .withMessage("Workshop id is required!")
-            .bail()
-            .custom(async workshopId => {
-                try{
-                    const result = await Workshop.getWorkshopDetails(workshopId);
-                    if(result.recordset.length == 0){
-                        return Promise.reject(
-                            {
-                                errorMsg: "Workshop not found!",
-                                status: 404
-                            }
-                        );
-                    }   
-                }
-                catch(err){
-                    return Promise.reject(
-                        {
-                            errorMsg: err.msg,
-                            status: err.status
-                        }
-                    );   
-                }
-            })
         ,
         body("father_name")
             .exists()
@@ -112,28 +90,6 @@ exports.insituteDetailsValidations = () => {
         body("workshop_id")
             .exists()
             .withMessage("Workshop id is required!")
-            .bail()
-            .custom(async workshopId => {
-                try{
-                    const result = await Workshop.getWorkshopDetails(workshopId);
-                    if(result.recordset.length == 0){
-                        return Promise.reject(
-                            {
-                                errorMsg: "Workshop not found!",
-                                status: 404
-                            }
-                        );
-                    }   
-                }
-                catch(err){
-                    return Promise.reject(
-                        {
-                            errorMsg: err.msg,
-                            status: err.status
-                        }
-                    );   
-                }
-            })
         ,
         body("institute_type")
             .exists()
@@ -163,28 +119,6 @@ exports.workshopDetailsValidations = () => {
         body("workshop_id")
             .exists()
             .withMessage("Workshop id is required!")
-            .bail()
-            .custom(async workshopId => {
-                try{
-                    const result = await Workshop.getWorkshopDetails(workshopId);
-                    if(result.recordset.length == 0){
-                        return Promise.reject(
-                            {
-                                errorMsg: "Workshop not found!",
-                                status: 404
-                            }
-                        );
-                    }   
-                }
-                catch(err){
-                    return Promise.reject(
-                        {
-                            errorMsg: err.msg,
-                            status: err.status
-                        }
-                    );   
-                }
-            })
         ,
         body("area_specialization_id")
             .exists()
@@ -245,5 +179,15 @@ exports.workshopDetailsValidations = () => {
             .bail()
             .isNumeric()
             .withMessage("Participant Number should be numeric!")
+    ];
+};
+
+
+exports.createWorkshopValidations = () => {
+    return [
+        body("workshop_id")
+            .exists()
+            .withMessage("Workshop id is required!")
+        ,
     ];
 };
