@@ -13,7 +13,7 @@ exports.tableNames = {
     COORDINATOR_DETAILS: 'coordinator_details',
     INSTITUTE: 'institute',
     WORKSHOP_DETAILS: 'workshop_details',
-    RESOURCE_PERSON:'resource_persons'
+    RESOURCE_PERSON:'resource_persons',
     TWILIO: 'twilio',
 };
 
