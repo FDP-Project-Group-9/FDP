@@ -114,6 +114,19 @@ module.exports = class ResourcePersonDetails {
         }
       };
 
+      static async getResourcePersonbyId(id) {
+        const db = getDB();
+        const queryStmt = `SELECT * FROM ${tableNames.RESOURCE_PERSON} WHERE id = @id`;
+        try {
+          return await db.request()
+          .input('id', dbTypes.Int, id)
+          .query(queryStmt);
+        }
+        catch(err) {
+          throwError(err.originalError.info.message, 500);
+        }
+      };
+
       static async getAllResourcePersonDetails() {
         const db = getDB();
         const queryStmt = `SELECT * FROM ${tableNames.RESOURCE_PERSON}`;
@@ -140,4 +153,37 @@ module.exports = class ResourcePersonDetails {
       };
 
     
+    static async applyFiltersonResourcePerson(data,limit){
+      const db = getDB();
+      console.log(data)
+      let  queryStmt = `SELECT * FROM ${tableNames.RESOURCE_PERSON}`;
+
+      if(data.designation!=undefined || data.specialization_id!=undefined || data.country!=undefined || data.state_name!=undefined || data.organization_name!=undefined){
+        queryStmt+=` WHERE 1=1`;
+      }
+      if(data.designation!=undefined){
+         queryStmt+=` AND designation=`+data.designation;
+      }
+      if(data.specialization_id!=undefined){
+        queryStmt+=` AND specialization_id=`+ data.specialization_id;
+      }
+      if(data.country!=undefined){
+        queryStmt+=` AND country=`+data.country;
+      }
+      if(data.state_name!=undefined){
+        queryStmt+=` AND state_name=`+data.state_name;
+      }
+      if(data.organization_name!=undefined){
+        queryStmt+=` AND organization_name=`+data.organization_name;
+      }
+      // queryStmt+=` LIMIT `+limit ;
+      console.log(queryStmt)
+      try {
+        return await db.request()
+        .query(queryStmt);
+      }
+      catch(err) {
+        throwError(err.originalError.info.message, 500);
+      }
+    }
 };
