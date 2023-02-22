@@ -1,23 +1,33 @@
 const ResourcePerson=require('../models/resourcePerson')
+const WorkshopSpecialization=require('../models/workshopSpecialization')
 
 const {throwError}=require('../utils/helper')
 
 exports.addResourcePerson=(async(req,res,next)=>{
     const edit=req.query.edit;
     let requestData=new Object();
+    let resp
+    let specialization
+    try{
+        resp=await WorkshopSpecialization.findIfSpecializationExists(req.body.specialization)
+        specialization=resp.recordset[0]
+    }
+    catch(err){
+        return next(err)
+    }
+
     requestData={
     name:req.body.person_name,
     emailId:req.body.email_id,
     mobNo:req.body.mobile_no,
     designation:req.body.designation,
-    specialization_id:req.body.specialization_id,
+    specialization_id:specialization.id,
     country:req.body.country,
     state_name:req.body.state_name,
     organization_name:req.body.organization_name
     }
     if(edit && edit.toLowerCase() == 'true'){
         const id=req.body.id
-        console.log(requestData)
       try{
         const result=await ResourcePerson.updateResourcePerson(id,requestData);
         return res.status(200).json({msg: "Details of Resource Person Successfully updated"});
@@ -72,12 +82,23 @@ exports.deleteSingleResourcePerson=(async(req,res,next)=>{
 })
 
 exports.getResourcePersonDetails=(async(req,res,next)=>{
-    console.log(req.query)
     const limit=req.query.limit; 
     let requestData=new Object();
+
+    let resp
+    let specialization={}
+    if(req.query.specialization){
+    try{
+        resp=await WorkshopSpecialization.findIfSpecializationExists(req.query.specialization)
+        specialization=resp.recordset[0]
+    }
+    catch(err){
+        return next(err)
+    }
+}
     requestData={
     designation:req.query.designation,
-    specialization_id:req.query.specialization_id,
+    specialization_id:specialization.id,
     country:req.query.country,
     state_name:req.query.state_name,
     organization_name:req.query.organization_name

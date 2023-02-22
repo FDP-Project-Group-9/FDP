@@ -92,13 +92,13 @@ exports.resourcePersondetailsValidation = () => {
         .exists()
         .withMessage("desigation is required")
         ,
-        body("specialization_id")
+        body("specialization")
             .exists()
-            .withMessage("Specialization id is required!")
+            .withMessage("Specialization is required!")
             .bail()
-            .custom(async (specializationId) => {
+            .custom(async (specialization) => {
                 try {
-                    const result = await WorkshopSpecialization.findSpecialization(specializationId);
+                    const result = await WorkshopSpecialization.findIfSpecializationExists(specialization);
                     if(result.recordset.length == 0){
                         return Promise.reject(
                             {

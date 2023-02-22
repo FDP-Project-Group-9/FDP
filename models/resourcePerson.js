@@ -127,17 +127,7 @@ module.exports = class ResourcePersonDetails {
         }
       };
 
-      static async getAllResourcePersonDetails() {
-        const db = getDB();
-        const queryStmt = `SELECT * FROM ${tableNames.RESOURCE_PERSON}`;
-        try {
-          return await db.request()
-          .query(queryStmt);
-        }
-        catch(err) {
-          throwError(err.originalError.info.message, 500);
-        }
-      };
+
 
       static async deleteResourcePersonbyId(id) {
         const db = getDB();
@@ -161,25 +151,47 @@ module.exports = class ResourcePersonDetails {
       if(data.designation!=undefined || data.specialization_id!=undefined || data.country!=undefined || data.state_name!=undefined || data.organization_name!=undefined){
         queryStmt+=` WHERE 1=1`;
       }
-      if(data.designation!=undefined){
-         queryStmt+=` AND designation=`+data.designation;
+      // if(data.designation!=undefined){
+      //    queryStmt+=` AND designation =`+data.designation;
+      // }
+      // if(data.specialization_id!=undefined){
+      //   queryStmt+=` AND specialization_id=`+ data.specialization_id;
+      // }
+      // if(data.country!=undefined){
+      //   queryStmt+=` AND country=`+data.country;
+      // }
+      // if(data.state_name!=undefined){
+      //   queryStmt+=` AND state_name=`+data.state_name;
+      // }
+      // if(data.organization_name!=undefined){
+      //   queryStmt+=` AND organization_name=`+data.organization_name;
+      // }
+
+
+
+       if(data.designation!=undefined){
+         queryStmt+=` AND designation =@designation`
       }
       if(data.specialization_id!=undefined){
-        queryStmt+=` AND specialization_id=`+ data.specialization_id;
+        queryStmt+=` AND specialization_id=@specialization_id`;
       }
       if(data.country!=undefined){
-        queryStmt+=` AND country=`+data.country;
+        queryStmt+=` AND country=@country`;
       }
       if(data.state_name!=undefined){
-        queryStmt+=` AND state_name=`+data.state_name;
+        queryStmt+=` AND state_name@state_name=`;
       }
       if(data.organization_name!=undefined){
-        queryStmt+=` AND organization_name=`+data.organization_name;
+        queryStmt+=` AND organization_name=@organization_name`;
       }
       // queryStmt+=` LIMIT `+limit ;
-      console.log(queryStmt)
       try {
         return await db.request()
+        .input('designation', dbTypes.VarChar(30), data.designation)
+        .input('specialization_id', dbTypes.Int, data.specialization_id)
+        .input('country', dbTypes.VarChar(50), data.country)
+        .input('state_name', dbTypes.VarChar(50), data.state_name)
+        .input('organization_name', dbTypes.VarChar(255), data.organization_name)
         .query(queryStmt);
       }
       catch(err) {
