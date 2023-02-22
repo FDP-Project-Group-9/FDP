@@ -427,3 +427,20 @@ exports.verifyOTP = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.approveWorkshop = async (req, res, next) => {
+    const workshopId = req.body['workshop_id'];
+    
+    try{
+        const result = await WorkshopDetails.approveWorkshop(workshopId);
+        if(result.rowsAffected[0] == 0){
+            throwError("Workshop not found!", 404);
+        }
+        res.status(200).json({
+            msg: "Workshop approved successfully!"
+        });
+    }
+    catch(err){
+        next(err);
+    }
+};

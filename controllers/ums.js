@@ -108,12 +108,7 @@ exports.userDetails=async (req,res,next)=>{
 }
 
 exports.authorize=async(req,res,next)=>{
-    const user = res.locals.user;
     try{
-        if(user['role_name'].toLowerCase() != 'administrator'){
-            throwError("Action not allowed, only administrators can authorize coordinators!", 403);
-        }
-        
         const authorized_user=await User.findUserById(req.params.id)
         let authorize_user=authorized_user.recordsets[0][0];
         if(!authorize_user){

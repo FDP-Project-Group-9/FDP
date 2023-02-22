@@ -6,6 +6,7 @@ const {
     uploadFilesValidationRules,
     loginValidationRules,
 } = require('../middlewares/umsValidations');
+const { verifyAdministratorRole } = require("../middlewares/userAuthorization");
 const { validationErrorHandler } = require("../utils/helper");
 
 //creating routes object
@@ -20,7 +21,7 @@ routes.post("/login",loginValidationRules(),validationErrorHandler,login);
 
 routes.get('/user-details/:id', authenticateJWT, userDetails);
 
-routes.put('/authorize-user/:id', authenticateJWT, authorize)
+routes.put('/authorize-user/:id', authenticateJWT, verifyAdministratorRole, authorize)
 
 routes.get('/roles', getRoles);
 
