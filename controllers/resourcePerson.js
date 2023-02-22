@@ -61,7 +61,7 @@ exports.getSingleResourcePerson=(async(req,res,next)=>{
         const results=result.recordset 
         return res.status(200).json({
         msg: "Workshop details successfully fetched!",
-        data: responseData});
+        data: results});
      }
      catch(err){
          return next(err);
