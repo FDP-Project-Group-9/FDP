@@ -182,3 +182,16 @@ exports.uploadFiles = async (req, res, next) => {
         next(err);
     }
 }
+
+exports.getRoles = async (req, res, next) => {
+    try{
+        let roles = await Role.getAllRoles();
+        roles = roles.recordsets[0];
+        res.status(200).json({
+            data: roles
+        });
+    }  
+    catch(err){
+        next(err);
+    }
+};
