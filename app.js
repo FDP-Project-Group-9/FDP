@@ -12,6 +12,7 @@ require('dotenv').config();
 
 const onBoardingRoutes = require('./routes/ums');
 const workshopRoutes = require('./routes/workshop');
+const resourcePersonRoutes=require('./routes/resoucePerson')
 
 const { connectDB } = require('./config/db');
 const { passportMiddleware, authenticateJWT } = require('./middlewares/passport');
@@ -69,6 +70,9 @@ app.use('/ums', upload.array("docs"), onBoardingRoutes);
 
 // workshop routes
 app.use('/workshop', authenticateJWT, workshopRoutes);
+
+// Resource Person routes
+app.use('/resource-person', authenticateJWT,resourcePersonRoutes);
 
 // error handler
 app.use((error, req, res, next) => {

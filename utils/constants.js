@@ -12,7 +12,8 @@ exports.tableNames = {
     WORKSHOP_SPECIALIZATION: 'workshop_specializations',
     COORDINATOR_DETAILS: 'coordinator_details',
     INSTITUTE: 'institute',
-    WORKSHOP_DETAILS: 'workshop_details'
+    WORKSHOP_DETAILS: 'workshop_details',
+    RESOURCE_PERSON:'resource_persons'
 };
 
 exports.workshop = {
@@ -42,6 +43,9 @@ exports.coordinator_details = {
         experience: 'experience',
     }
 };
+
+
+
 
 exports.institute_details = {
     colNames: {
