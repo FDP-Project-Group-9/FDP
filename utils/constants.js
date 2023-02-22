@@ -14,6 +14,7 @@ exports.tableNames = {
     INSTITUTE: 'institute',
     WORKSHOP_DETAILS: 'workshop_details',
     RESOURCE_PERSON:'resource_persons'
+    TWILIO: 'twilio',
 };
 
 exports.workshop = {
@@ -23,7 +24,8 @@ exports.workshop = {
         coCoordinatorId: 'co_coordinator_id',
         instituteId: 'institute_id',
         workshopDetailsId: 'workshop_details_id',
-        draft: 'draft'
+        draft: 'draft',
+        otpVerified: 'otp_verified'
     }
 };
 
@@ -76,5 +78,12 @@ exports.workshop_details = {
         quizGenerated: 'quiz_generated',
         quizId: 'quiz_id',
         workshopCompleted: 'workshop_completed'
+    }
+};
+
+exports.twilio = {
+    colNames: {
+        id: 'id',
+        sid: 'sid'
     }
 };

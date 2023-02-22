@@ -1,6 +1,6 @@
 const express = require('express');
 const { authenticateJWT } = require('../middlewares/passport');
-const { signup, uploadFiles,login,userDetails,authorize } = require('../controllers/ums');
+const { signup, uploadFiles,login,userDetails,authorize, getRoles } = require('../controllers/ums');
 const { 
     signupValidationRules, 
     uploadFilesValidationRules,
@@ -21,5 +21,7 @@ routes.post("/login",loginValidationRules(),validationErrorHandler,login);
 routes.get('/user-details/:id', authenticateJWT, userDetails);
 
 routes.put('/authorize-user/:id', authenticateJWT, authorize)
+
+routes.get('/roles', getRoles);
 
 module.exports = routes;

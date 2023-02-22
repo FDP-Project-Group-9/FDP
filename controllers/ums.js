@@ -108,7 +108,12 @@ exports.userDetails=async (req,res,next)=>{
 }
 
 exports.authorize=async(req,res,next)=>{
+    const user = res.locals.user;
     try{
+        if(user['role_name'].toLowerCase() != 'administrator'){
+            throwError("Action not allowed, only administrators can authorize coordinators!", 403);
+        }
+        
         const authorized_user=await User.findUserById(req.params.id)
         let authorize_user=authorized_user.recordsets[0][0];
         if(!authorize_user){
@@ -177,3 +182,16 @@ exports.uploadFiles = async (req, res, next) => {
         next(err);
     }
 }
+
+exports.getRoles = async (req, res, next) => {
+    try{
+        let roles = await Role.getAllRoles();
+        roles = roles.recordsets[0];
+        res.status(200).json({
+            data: roles
+        });
+    }  
+    catch(err){
+        next(err);
+    }
+};

@@ -2,7 +2,7 @@ const express = require('express');
 const { addWorkshopSpecialization, getWorkshopSpecializations } = require('../controllers/workshopSpecialization');
 const { verifyCoordinatorRole } = require('../middlewares/userAuthorization');
 const { addWorkshopSpecializationValidations } = require("../middlewares/workshopSpecializationValidations");
-const { getWorkshopDetails } = require("../controllers/showWorkshop")
+const { getWorkshopDetails, getAllWorkshops, getUserWorkshops } = require("../controllers/showWorkshop")
 const { validationErrorHandler } = require('../utils/helper');
 const createWorkshopRoutes = require('./createWorkshop');
 
@@ -16,6 +16,9 @@ routes.post("/specialization", verifyCoordinatorRole, addWorkshopSpecializationV
 routes.get("/specializations", verifyCoordinatorRole, getWorkshopSpecializations);
 
 //get workshop details
+routes.get("/user-workshops", verifyCoordinatorRole, getUserWorkshops);
 routes.get("/:workshop_id", getWorkshopDetails);
+
+routes.get("/", getAllWorkshops);
 
 module.exports = routes;

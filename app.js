@@ -16,6 +16,7 @@ const resourcePersonRoutes=require('./routes/resoucePerson')
 
 const { connectDB } = require('./config/db');
 const { passportMiddleware, authenticateJWT } = require('./middlewares/passport');
+const { createTwilioSMSService } = require('./utils/otp');
 
 const port = process.env.PORT || 5000;
 const app = express();
@@ -90,7 +91,8 @@ app.use((error, req, res, next) => {
 
 
 connectDB(() => {
-  app.listen(port, () => {
+  app.listen(port, async () => {
+
     fs.stat("./files", (err) => {
       if(err){
         fs.mkdir("./files", {}, error => {
@@ -99,7 +101,8 @@ connectDB(() => {
             console.log(error);
           }
         });
-      }
+      };
+
       fs.stat("./files/user-docs", err => {
         if(err){
           fs.mkdir("./files/user-docs", error => {
@@ -110,7 +113,9 @@ connectDB(() => {
           });
         }
       })
-    })
+    });
+
+    await createTwilioSMSService();
     console.log(`Server running on port ${port}`)
   });
 });

@@ -15,4 +15,17 @@ module.exports = class Roles {
         throwError(err.originalError.info.message, 500);
     }
   }  
+
+  static async getAllRoles() {
+    const db = getDB();
+    const queryStmt = `SELECT * FROM ${tableNames.ROLES}`;
+
+    try{
+      return await db.request()
+      .query(queryStmt);
+    }
+    catch(err){
+      throwError(err.originalError.info.message, 500);
+    }
+  }
 };
