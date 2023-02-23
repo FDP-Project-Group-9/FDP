@@ -60,9 +60,9 @@ exports.login= async(req,res,next)=>{
         const user_details=await User.findUserByEmail(emailId);
         const user=user_details.recordsets[0][0];
 
-        if(user.profile_approved!==true){
-            throwError("Registration of User is not approved", 403);
-        }
+        // if(user.profile_approved!==true){
+        //     throwError("Registration of User is not approved", 403);
+        // }
 
         bycrypt.compare(password,user.password)
         .then(isMatch =>{
