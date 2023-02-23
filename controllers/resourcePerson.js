@@ -6,22 +6,12 @@ const {throwError}=require('../utils/helper')
 exports.addResourcePerson=(async(req,res,next)=>{
     const edit=req.query.edit;
     let requestData=new Object();
-    let resp
-    let specialization
-    try{
-        resp=await WorkshopSpecialization.findIfSpecializationExists(req.body.specialization)
-        specialization=resp.recordset[0]
-    }
-    catch(err){
-        return next(err)
-    }
-
     requestData={
     name:req.body.person_name,
     emailId:req.body.email_id,
     mobNo:req.body.mobile_no,
     designation:req.body.designation,
-    specialization_id:specialization.id,
+    specialization_id:req.body.specialization_id,
     country:req.body.country,
     state_name:req.body.state_name,
     organization_name:req.body.organization_name
@@ -38,7 +28,6 @@ exports.addResourcePerson=(async(req,res,next)=>{
     }
     else{
         const user = new ResourcePerson(requestData)
-        console.log(user)
             try{
                 await user.addResourcePersonDetails();
                 return res.status(201).json({msg: "Resource Person Successfully Added"});
@@ -50,8 +39,6 @@ exports.addResourcePerson=(async(req,res,next)=>{
 
    
 })
-
-
 
 
 exports.getSingleResourcePerson=(async(req,res,next)=>{
