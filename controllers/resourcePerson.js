@@ -72,20 +72,10 @@ exports.getResourcePersonDetails=(async(req,res,next)=>{
     const limit=req.query.limit; 
     let requestData=new Object();
 
-    let resp
-    let specialization={}
-    if(req.query.specialization){
-    try{
-        resp=await WorkshopSpecialization.findIfSpecializationExists(req.query.specialization)
-        specialization=resp.recordset[0]
-    }
-    catch(err){
-        return next(err)
-    }
-}
+   
     requestData={
     designation:req.query.designation,
-    specialization_id:specialization.id,
+    specialization_id:req.query.specialization_id,
     country:req.query.country,
     state_name:req.query.state_name,
     organization_name:req.query.organization_name
