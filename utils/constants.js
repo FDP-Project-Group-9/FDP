@@ -13,6 +13,7 @@ exports.tableNames = {
     COORDINATOR_DETAILS: 'coordinator_details',
     INSTITUTE: 'institute',
     WORKSHOP_DETAILS: 'workshop_details',
+    RESOURCE_PERSON:'resource_persons',
     TWILIO: 'twilio',
 };
 
@@ -44,6 +45,9 @@ exports.coordinator_details = {
         experience: 'experience',
     }
 };
+
+
+
 
 exports.institute_details = {
     colNames: {
