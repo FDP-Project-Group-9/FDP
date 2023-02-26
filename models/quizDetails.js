@@ -66,4 +66,17 @@ module.exports = class quizDetails {
         }
       };
 
+      static async deleteQuiz(id){
+        const db=getDB();
+        const queryStmt = `DELETE FROM ${tableNames.QUIZ} WHERE id=@id`;
+        try {
+            return await db.request()
+            .input('id',dbTypes.Int,id)
+            .query(queryStmt);
+          }
+          catch(err) {
+            throwError(err.originalError.info.message, 500);
+          }
+      }
+
 };

@@ -53,7 +53,6 @@ exports.addQuestions=(async(req,res,next)=>{
         const id=req.body.question_id
         try{
             const result=await questions.updateQuestion(id,requestData);
-             const ans=await questions.findQuestionStatementById(id);
             if(result.rowsAffected.length > 0){
           return res.status(200).json({msg: "Details of Questions Successfully updated"});
             }
@@ -67,7 +66,6 @@ exports.addQuestions=(async(req,res,next)=>{
     }
     else{
         try{
-            console.log(requestData)
         const question=new questions(requestData);
         await question.addQuestionDetails();
         return res.status(201).json({msg: "Question Successfully Added"});
@@ -75,5 +73,43 @@ exports.addQuestions=(async(req,res,next)=>{
     catch(err){
         next(err);
     }
+    }
+})
+
+
+
+exports.deleteQuiz=(async(req,res,next)=>{
+    const id=req.body.quiz_id;
+
+    try{
+        const results=await questions.deleteAllQuestions(id);
+        const result=await quizDetails.deleteQuiz(id);
+      
+       if(result.rowsAffected.length > 0){
+     return res.status(200).json({msg: "Quiz Successfully deleted"});
+       }
+       else{
+           throwError("Something went Wrong",400);
+       }
+    }
+    catch(err){
+        next(err);
+    }
+})
+
+exports.deleteQuestion=(async(req,res,next)=>{
+    const id=req.body.question_id;
+
+    try{
+        const result=await questions.deleteQuestionByID(id);
+       if(result.rowsAffected.length > 0){
+     return res.status(200).json({msg: "Question deleted Successfully...."});
+       }
+       else{
+           throwError("Something went Wrong!!",400);
+       }
+    }
+    catch(err){
+        next(err);
     }
 })

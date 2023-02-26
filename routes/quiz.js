@@ -1,7 +1,9 @@
 const express = require('express');
 const {
     createQuiz,
-    addQuestions
+    addQuestions,
+    deleteQuiz,
+    deleteQuestion
 } = require('../controllers/quiz');
 
 const { validationErrorHandler } = require("../utils/helper");
@@ -15,6 +17,10 @@ const routes = express.Router();
 routes.put('/create_Quiz',quizValidationRules(),validationErrorHandler,createQuiz);
 
 routes.put('/addQuestion',questionValidationRules(),validationErrorHandler,addQuestions);
+
+routes.delete('/delete-quiz',validationErrorHandler,deleteQuiz);
+
+routes.delete('/delete-question',validationErrorHandler,deleteQuestion);
 
 
 

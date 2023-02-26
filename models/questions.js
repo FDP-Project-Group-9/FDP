@@ -107,4 +107,32 @@ module.exports = class Questions {
         }
       };
 
-};
+
+       static async deleteAllQuestions(id){
+        const db=getDB();
+        const queryStmt = `DELETE FROM ${tableNames.QUESTIONS} WHERE  ${colNames.quiz_id} = ${'@' + colNames.quiz_id}`;
+        try {
+            return await db.request()
+            .input('quiz_id',dbTypes.Int,id)
+            .query(queryStmt);
+          }
+          catch(err) {
+            throwError(err.originalError.info.message, 500);
+          }
+      }
+
+      static async deleteQuestionByID(id){
+        const db=getDB();
+        const queryStmt = `DELETE FROM ${tableNames.QUESTIONS} WHERE  ${colNames.question_id} = ${'@' + colNames.question_id}`;
+        try {
+            return await db.request()
+            .input('question_id',dbTypes.Int,id)
+            .query(queryStmt);
+          }
+          catch(err) {
+            throwError(err.originalError.info.message, 500);
+          }
+      }
+
+
+    };
