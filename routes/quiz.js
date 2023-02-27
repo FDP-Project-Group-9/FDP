@@ -3,7 +3,8 @@ const {
     createQuiz,
     addQuestions,
     deleteQuiz,
-    deleteQuestion
+    deleteQuestion,
+    getQustions
 } = require('../controllers/quiz');
 
 const { validationErrorHandler } = require("../utils/helper");
@@ -21,6 +22,8 @@ routes.put('/addQuestion',questionValidationRules(),validationErrorHandler,addQu
 routes.delete('/delete-quiz',validationErrorHandler,deleteQuiz);
 
 routes.delete('/delete-question',validationErrorHandler,deleteQuestion);
+
+routes.get('/getQuestions',validationErrorHandler,getQustions);
 
 
 

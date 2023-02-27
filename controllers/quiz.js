@@ -113,3 +113,19 @@ exports.deleteQuestion=(async(req,res,next)=>{
         next(err);
     }
 })
+
+
+exports.getQustions=(async(req,res,next)=>{
+    const id = req.body.quiz_id;
+    try{
+           const result=await questions.getQuestionByFilters(id);
+           const results=result.recordset 
+           return res.status(200).json({
+           msg: "Quiz details successfully fetched!",
+           data: results
+       });
+    }
+    catch(err){
+        next(err);
+    }
+})

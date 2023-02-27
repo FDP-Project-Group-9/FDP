@@ -48,28 +48,6 @@ exports.questionValidationRules = () => {
             .bail()
             .exists()
             .withMessage("Qestion Statement is required!")
-            .bail()
-            .custom(async QuestStmt => {
-                try{
-                   
-                    const result = await Questions.findQuestionStatement(QuestStmt);
-                    if(result.recordset.length > 0)
-                        return Promise.reject(
-                            {
-                                errorMsg: "Question Statemnt already exists!",
-                                status: 409
-                            }
-                        );           
-                }
-                catch(err){
-                    return Promise.reject(
-                        { 
-                            errorMsg: err.msg, 
-                            status: err.status
-                        }
-                    );
-                }
-            })
         ,
         body("option1")
         .if((value, {req}) => {

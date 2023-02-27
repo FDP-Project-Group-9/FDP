@@ -20,8 +20,6 @@ module.exports = class quizDetails {
         )`;
 
         try{
-            console.log(this[colNames.quiz_name])
-            console.log(queryStmt)
             return await db.request()
             .input(colNames.quiz_name, dbTypes.VarChar(50), this[colNames.quiz_name])
             .query(queryStmt);
@@ -36,8 +34,6 @@ module.exports = class quizDetails {
         const db=getDB()
         const queryStmt=`SELECT * FROM ${tableNames.QUIZ} WHERE ${colNames.quiz_name}=${'@' + colNames.quiz_name}`;
         try{
-            console.log(queryStmt)
-            console.log(data)
             return await db.request()
             .input(colNames.quiz_name,dbTypes.VarChar(50),data)
             .query(queryStmt);

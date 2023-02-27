@@ -134,5 +134,20 @@ module.exports = class Questions {
           }
       }
 
-
+        static async getQuestionByFilters(id){
+            const db=getDB();
+            let queryStmt = `SELECT * FROM ${tableNames.QUESTIONS}`;
+            if(id!=undefined)
+            {
+                queryStmt+=` WHERE ${colNames.quiz_id} = ${'@' + colNames.quiz_id}`;
+            }
+            try {
+                return await db.request()
+                .input('quiz_id',dbTypes.Int,id)
+                .query(queryStmt);
+              }
+              catch(err) {
+                throwError(err.originalError.info.message, 500);
+              }
+        }
     };
