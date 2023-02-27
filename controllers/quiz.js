@@ -129,3 +129,8 @@ exports.getQustions=(async(req,res,next)=>{
         next(err);
     }
 })
+
+
+exports.evaluateParticipants=(async(req,res,next)=>{
+    
+})

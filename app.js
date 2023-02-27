@@ -77,9 +77,6 @@ app.use('/workshop', authenticateJWT, workshopRoutes);
 // Resource Person routes
 app.use('/resource-person', authenticateJWT,verifyCoordinatorRole,resourcePersonRoutes);
 
-//Quiz Routes
-app.use('/quiz',authenticateJWT,verifyCoordinatorRole,quizRoutes);
-
 // error handler
 app.use((error, req, res, next) => {
   if(error){

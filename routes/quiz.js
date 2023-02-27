@@ -4,7 +4,8 @@ const {
     addQuestions,
     deleteQuiz,
     deleteQuestion,
-    getQustions
+    getQustions,
+    evaluateParticipants
 } = require('../controllers/quiz');
 
 const { validationErrorHandler } = require("../utils/helper");
@@ -15,16 +16,17 @@ const {
 
 const routes = express.Router();
 
-routes.put('/create_Quiz',quizValidationRules(),validationErrorHandler,createQuiz);
+routes.put('/create_Quiz',verifyCoordinatorRole,quizValidationRules(),validationErrorHandler,createQuiz);
 
-routes.put('/addQuestion',questionValidationRules(),validationErrorHandler,addQuestions);
+routes.put('/addQuestion',verifyCoordinatorRole,questionValidationRules(),validationErrorHandler,addQuestions);
 
-routes.delete('/delete-quiz',validationErrorHandler,deleteQuiz);
+routes.delete('/delete-quiz',verifyCoordinatorRole,validationErrorHandler,deleteQuiz);
 
-routes.delete('/delete-question',validationErrorHandler,deleteQuestion);
+routes.delete('/delete-question',verifyCoordinatorRole,validationErrorHandler,deleteQuestion);
 
 routes.get('/getQuestions',validationErrorHandler,getQustions);
 
+routes.put('/evaluateParticipant',validationErrorHandler,evaluateParticipants);
 
 
 module.exports = routes;

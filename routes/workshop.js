@@ -5,6 +5,7 @@ const { addWorkshopSpecializationValidations } = require("../middlewares/worksho
 const { getWorkshopDetails, getAllWorkshops, getUserWorkshops } = require("../controllers/showWorkshop")
 const { validationErrorHandler } = require('../utils/helper');
 const createWorkshopRoutes = require('./createWorkshop');
+const quizRoutes=require('./quiz');
 
 const routes = express.Router();
 
@@ -20,5 +21,8 @@ routes.get("/user-workshops", verifyCoordinatorRole, getUserWorkshops);
 routes.get("/:workshop_id", getWorkshopDetails);
 
 routes.get("/", getAllWorkshops);
+
+//quiz Routes
+app.use('/quiz',authenticateJWT,quizRoutes);
 
 module.exports = routes;
