@@ -4,8 +4,9 @@ const { tableNames } = require("../utils/constants");
 const { colNames } = require("../utils/constants").workshop;
 
 module.exports = class Workshop {
-    constructor(coordinatorId) {
+    constructor(coordinatorId, instituteId) {
         this.coordinatorId = coordinatorId;
+        this.instituteId = instituteId;
     };
 
     async createWorkshop() {
@@ -30,7 +31,7 @@ module.exports = class Workshop {
             return await db.request()
             .input(colNames.coordinatorId, dbTypes.Int, this.coordinatorId)
             .input(colNames.coCoordinatorId, dbTypes.Int, this[colNames.coCoordinatorId] ? this[colNames.coCoordinatorId] : null)
-            .input(colNames.instituteId, dbTypes.Int, this[colNames.instituteId] ? this[colNames.instituteId] : null)
+            .input(colNames.instituteId, dbTypes.Int, this.instituteId)
             .input(colNames.workshopDetailsId, dbTypes.Int, this[colNames.workshopDetailsId] ? this[colNames.workshopDetailsId] : null)
             .query(queryStmt);
         }

@@ -12,9 +12,14 @@ const { sendOTP, verifyOTP } = require("../utils/otp");
 exports.createWorkshopDraft = async (req, res, next) => {
     const user = res.locals.user;
     const userId = user['user_id'];
-    const workshop = new Workshop(userId);
-
+    let instituteId = null;
+    
     try {
+        const instituteResult = await Institute.findDetails(userId);
+        if(instituteResult.recordset.length > 0){
+            instituteId = instituteResult.recordset[0]['id'];
+        }
+        const workshop = new Workshop(userId, instituteId);
         const result = await workshop.createWorkshop();
         const workshopId = result.recordset[0]['workshop_id'];
         res.status(201).json({
