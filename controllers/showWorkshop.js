@@ -28,10 +28,16 @@ exports.getWorkshopDetails = async (req, res, next) => {
 
         //find the details of coordinator from coordinator_details table
         const coordinatorId = workshopDetails['coordinator_id'];
-        result = await CoordinatorDetails.findDetails(coordinatorId);
-        const coordinatorDetails = result.recordset[0];
+        result = await User.findUserById(coordinatorId);
+        let coordinatorDetails = result.recordset[0];
         if(coordinatorDetails){
+            delete coordinatorDetails['password'];
             responseData['coordinator_details'] = coordinatorDetails;
+        }
+        result = await CoordinatorDetails.findDetails(coordinatorId);
+        coordinatorDetails = result.recordset[0];
+        if(coordinatorDetails){
+            responseData['coordinator_details'] = { ...responseData['coordinator_details'], ...coordinatorDetails};
         }
 
         //find the institute details of workshop from the institute details table
