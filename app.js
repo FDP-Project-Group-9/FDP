@@ -13,6 +13,7 @@ require('dotenv').config();
 const onBoardingRoutes = require('./routes/ums');
 const workshopRoutes = require('./routes/workshop');
 const resourcePersonRoutes=require('./routes/resoucePerson')
+const quizRoutes=require('./routes/quiz')
 
 const { connectDB } = require('./config/db');
 const { passportMiddleware, authenticateJWT } = require('./middlewares/passport');

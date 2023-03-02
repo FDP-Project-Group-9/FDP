@@ -20,8 +20,13 @@ exports.addResourcePerson=(async(req,res,next)=>{
         const id=req.body.id
       try{
         const result=await ResourcePerson.updateResourcePerson(id,requestData);
+        if(result.rowsAffected.length > 0){
         return res.status(200).json({msg: "Details of Resource Person Successfully updated"});
-      }
+        }
+        else{
+            throwError("Resource Person Not Found",404);
+        }  
+    }
       catch(err){
         return next(err)
       }
@@ -46,9 +51,14 @@ exports.getSingleResourcePerson=(async(req,res,next)=>{
     try{
         const result =await ResourcePerson.getResourcePersonbyId(id);
         const results=result.recordset 
+        if(result.recordsets.length > 0){
         return res.status(200).json({
-        msg: "Workshop details successfully fetched!",
+        msg: "Resource Person details successfully fetched!",
         data: results});
+        }
+        else {
+            throwError("Resource Person Not Found",404);
+        }
      }
      catch(err){
          return next(err);
@@ -84,7 +94,7 @@ exports.getResourcePersonDetails=(async(req,res,next)=>{
         const result= await ResourcePerson.applyFiltersonResourcePerson(requestData,limit);
         const results=result.recordset 
         return res.status(200).json({
-        msg: "Workshop details successfully fetched!",
+        msg: "Resource Person details successfully fetched!",
         data: results
     });
     }
