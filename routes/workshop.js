@@ -23,6 +23,6 @@ routes.get("/:workshop_id", getWorkshopDetails);
 routes.get("/", getAllWorkshops);
 
 //quiz Routes
-app.use('/quiz',authenticateJWT,quizRoutes);
+routes.use('/quiz',quizRoutes);
 
 module.exports = routes;

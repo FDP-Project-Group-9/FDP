@@ -18,7 +18,7 @@ exports.createQuiz=(async (req,res,next)=>{
           return res.status(200).json({msg: "Details of Resource Person Successfully updated"});
             }
             else{
-                throwError("Something went Wrong",400);
+                throwError("Quiz Not Found",404);
             }
         }
         catch(err){
@@ -57,7 +57,7 @@ exports.addQuestions=(async(req,res,next)=>{
           return res.status(200).json({msg: "Details of Questions Successfully updated"});
             }
             else{
-                throwError("Something went Wrong",400);
+                throwError("Quiz Not Found",404);
             }
         }
         catch(err){
@@ -89,7 +89,7 @@ exports.deleteQuiz=(async(req,res,next)=>{
      return res.status(200).json({msg: "Quiz Successfully deleted"});
        }
        else{
-           throwError("Something went Wrong",400);
+           throwError("Quiz Not Found",404);
        }
     }
     catch(err){
@@ -106,7 +106,7 @@ exports.deleteQuestion=(async(req,res,next)=>{
      return res.status(200).json({msg: "Question deleted Successfully...."});
        }
        else{
-           throwError("Something went Wrong!!",400);
+           throwError("Quiz Not Found !!",404);
        }
     }
     catch(err){
@@ -119,7 +119,7 @@ exports.getQustions=(async(req,res,next)=>{
     const id = req.body.quiz_id;
     try{
            const result=await questions.getQuestionByFilters(id);
-           const results=result.recordset 
+           const results=result.recordsets
            return res.status(200).json({
            msg: "Quiz details successfully fetched!",
            data: results

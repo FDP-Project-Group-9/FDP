@@ -14,6 +14,8 @@ const {
     quizValidationRules
 } = require("../middlewares/quiz");
 
+const { verifyCoordinatorRole } = require('../middlewares/userAuthorization');
+
 const routes = express.Router();
 
 routes.put('/create_Quiz',verifyCoordinatorRole,quizValidationRules(),validationErrorHandler,createQuiz);
