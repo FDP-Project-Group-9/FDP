@@ -4,6 +4,18 @@ exports.roles = {
     PARTICIPANT: 'participant'
 };
 
+exports.fileUploadNames = {
+    USER: {
+
+    },
+    WORKSHOP: {
+        IMAGES: "workshopImages",
+        MEDIA_IMAGES: "workshopMediaImages",
+        REPORT: "workshopReport",
+        STMT_OF_EXPENDITURE: "workshopStmtOfExpenditure"
+    }
+};
+
 exports.tableNames = {
     USERS: 'users',
     ROLES: 'roles',
@@ -15,6 +27,9 @@ exports.tableNames = {
     WORKSHOP_DETAILS: 'workshop_details',
     RESOURCE_PERSON:'resource_persons',
     TWILIO: 'twilio',
+    WORKSHOP_PHOTOS: 'workshop_photos',
+    WORKSHOP_MEDIA_PHOTOS: 'workshop_media_photos',
+    WORKSHOP_OTHER_DOCS: 'workshop_other_docs'
 };
 
 exports.workshop = {
@@ -45,8 +60,6 @@ exports.coordinator_details = {
         experience: 'experience',
     }
 };
-
-
 
 
 exports.institute_details = {
@@ -87,3 +100,31 @@ exports.twilio = {
         sid: 'sid'
     }
 };
+
+exports.workshop_photos = {
+    colNames: {
+        id: 'id',
+        photoUrl: 'photo_url',
+        workshopId: 'workshop_id'
+    }
+};
+
+exports.workshop_media_photos = {
+    colNames: {
+        id: 'id',
+        mediaPhotoUrl: 'media_photo_url',
+        workshopId: 'workshop_id'
+    }
+};
+
+exports.workshop_other_docs = {
+    colNames: {
+        id: 'id',
+        reportUrl: 'report_url',
+        stmtExpenditureUrl: 'stmt_expenditure_url',
+        certificateUrl: 'certificate_url',
+        workshopId: 'workshop_id'
+    }
+};
+
+exports.fileSize = 2 * 1024 * 1024;

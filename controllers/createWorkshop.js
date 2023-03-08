@@ -7,7 +7,7 @@ const Role = require("../models/roles");
 
 const { throwError } = require("../utils/helper");
 const { roles } = require("../utils/constants");
-const { sendOTP, verifyOTP } = require("../utils/otp");
+const { sendOTP, verifyOTP } = require("../config/otp");
 
 exports.createWorkshopDraft = async (req, res, next) => {
     const user = res.locals.user;

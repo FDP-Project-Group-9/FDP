@@ -7,8 +7,9 @@ const UserDocs = require("../models/userDocs");
 const Role = require("../models/roles");
 
 const { throwError } = require('../utils/helper');
-const { emailGenerator } = require('../utils/email');
+const { emailGenerator } = require('../config/email');
 const { roles } = require("../utils/constants"); 
+const { removeFiles } = require('../config/fileDirectory');
 
 exports.signup = ( async (req, res, next) => {
     const firstName = req.body["first_name"];
@@ -165,15 +166,7 @@ exports.uploadFiles = async (req, res, next) => {
     }
     catch(err){
         // removing files from file system if error occurs...
-        files.forEach(file => {
-            fs.rm(file.path, {}, err => {
-                if(err){
-                    const error = new Error();
-                    error.msg = "Something went wrong while deleting file from system!";
-                    error.status = 500;
-                }
-            });
-        });
+        removeFiles(files);
         next(err);
     }
 }

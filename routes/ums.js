@@ -8,6 +8,7 @@ const {
 } = require('../middlewares/umsValidations');
 const { verifyAdministratorRole } = require("../middlewares/userAuthorization");
 const { validationErrorHandler } = require("../utils/helper");
+const { uploadUserDocs } = require("../config/fileUploads");
 
 //creating routes object
 const routes = express.Router();
@@ -15,7 +16,7 @@ const routes = express.Router();
 //creating routes for onboarding...
 routes.post("/signup", signupValidationRules(), validationErrorHandler, signup);
 
-routes.post("/upload-files", uploadFilesValidationRules(), validationErrorHandler, uploadFiles);
+routes.post("/upload-files", uploadUserDocs, uploadFilesValidationRules(), validationErrorHandler, uploadFiles);
 
 routes.post("/login",loginValidationRules(),validationErrorHandler,login);
 
