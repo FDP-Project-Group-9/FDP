@@ -9,6 +9,8 @@ const { verifyCoordinatorRole, verifyAdministratorRole } = require('../middlewar
 const { addWorkshopSpecializationValidations } = require("../middlewares/workshopSpecializationValidations");
 const { getWorkshopDetails, getAllWorkshops, getUserWorkshops } = require("../controllers/showWorkshop")
 const { validationErrorHandler } = require('../utils/helper');
+const createWorkshopRoutes = require('./createWorkshop');
+const quizRoutes=require('./quiz');
 const { approveWorkshop } = require('../controllers/createWorkshop');
 const { workshopIdValidation } = require('../middlewares/workshopCreationValidations');
 const { checkIfWorkshopExists } = require('../middlewares/workshop');
@@ -35,6 +37,9 @@ routes.put("/approve", verifyAdministratorRole, workshopIdValidation(), validati
 routes.get("/user-workshops", verifyCoordinatorRole, getUserWorkshops);
 routes.get("/:workshop_id", getWorkshopDetails);
 
-routes.get("/",getAllWorkshops);
+routes.get("/", getAllWorkshops);
+
+//quiz Routes
+routes.use('/quiz',quizRoutes);
 
 module.exports = routes;

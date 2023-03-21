@@ -27,6 +27,8 @@ exports.tableNames = {
     WORKSHOP_DETAILS: 'workshop_details',
     RESOURCE_PERSON:'resource_persons',
     TWILIO: 'twilio',
+    QUESTIONS:'questions',
+    QUIZ:'quizes',
     WORKSHOP_PHOTOS: 'workshop_photos',
     WORKSHOP_MEDIA_PHOTOS: 'workshop_media_photos',
     WORKSHOP_OTHER_DOCS: 'workshop_other_docs'
@@ -93,6 +95,26 @@ exports.workshop_details = {
         workshopCompleted: 'workshop_completed'
     }
 };
+
+exports.quizes={
+    colNames:{
+     quiz_id:'quiz_id',
+     quiz_name:'quiz_name'
+    }
+};
+
+exports.questions={
+    colNames:{
+        quiz_id:'quiz_id',
+        question_id:'question_id',
+        questStmt:'question_statement',
+        option1:'option1',
+        option2:'option2',
+        option3:'option3',
+        option4:'option4',
+        answer:'answer'
+    }
+}
 
 exports.twilio = {
     colNames: {
