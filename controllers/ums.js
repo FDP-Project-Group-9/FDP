@@ -7,8 +7,9 @@ const UserDocs = require("../models/userDocs");
 const Role = require("../models/roles");
 
 const { throwError } = require('../utils/helper');
-const { emailGenerator } = require('../utils/email');
+const { emailGenerator } = require('../config/email');
 const { roles } = require("../utils/constants"); 
+const { removeFiles } = require('../config/fileDirectory');
 
 exports.signup = ( async (req, res, next) => {
     const firstName = req.body["first_name"];
@@ -108,12 +109,7 @@ exports.userDetails=async (req,res,next)=>{
 }
 
 exports.authorize=async(req,res,next)=>{
-    const user = res.locals.user;
     try{
-        if(user['role_name'].toLowerCase() != 'administrator'){
-            throwError("Action not allowed, only administrators can authorize coordinators!", 403);
-        }
-        
         const authorized_user=await User.findUserById(req.params.id)
         let authorize_user=authorized_user.recordsets[0][0];
         if(!authorize_user){
@@ -170,15 +166,7 @@ exports.uploadFiles = async (req, res, next) => {
     }
     catch(err){
         // removing files from file system if error occurs...
-        files.forEach(file => {
-            fs.rm(file.path, {}, err => {
-                if(err){
-                    const error = new Error();
-                    error.msg = "Something went wrong while deleting file from system!";
-                    error.status = 500;
-                }
-            });
-        });
+        removeFiles(files);
         next(err);
     }
 }

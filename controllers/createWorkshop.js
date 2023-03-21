@@ -7,7 +7,7 @@ const Role = require("../models/roles");
 
 const { throwError } = require("../utils/helper");
 const { roles } = require("../utils/constants");
-const { sendOTP, verifyOTP } = require("../utils/otp");
+const { sendOTP, verifyOTP } = require("../config/otp");
 
 exports.createWorkshopDraft = async (req, res, next) => {
     const user = res.locals.user;
@@ -427,6 +427,23 @@ exports.verifyOTP = async (req, res, next) => {
                 msg: "Invlaid otp!"
             });
         }
+    }
+    catch(err){
+        next(err);
+    }
+};
+
+exports.approveWorkshop = async (req, res, next) => {
+    const workshopId = req.body['workshop_id'];
+    
+    try{
+        const result = await WorkshopDetails.approveWorkshop(workshopId);
+        if(result.rowsAffected[0] == 0){
+            throwError("Workshop not found!", 404);
+        }
+        res.status(200).json({
+            msg: "Workshop approved successfully!"
+        });
     }
     catch(err){
         next(err);

@@ -2,9 +2,12 @@ const Workshop = require("../models/workshop");
 const CoordinatorDetails = require("../models/coordinatorDetails");
 const Institute = require("../models/institute");
 const WorkshopDetails = require("../models/workshopDetails");
+const WorkshopMediaPhotos = require("../models/workshopMediaPhotos");
+const WorkshopOtherDocs = require("../models/workshopOtherDocs");
+const WorkshopPhotos = require("../models/workshopPhotos");
 const User = require("../models/user");
 
-const { throwError } = require("../utils/helper");
+const { throwError, getAllResults, getFirstResult } = require("../utils/helper");
 
 exports.getWorkshopDetails = async (req, res, next) => {
     const workshopId = req.params['workshop_id'];
@@ -13,6 +16,15 @@ exports.getWorkshopDetails = async (req, res, next) => {
         institute_details: {},
         workshop_details: {},
         co_coordinator_details: {},
+        files_url: {
+            media_photos: [],
+            workshop_photos: [],
+            other_docs: {
+                report: null,
+                stmt_expenditure: null,
+                certificate: null
+            }
+        }
     };
     let workshopDetails;
 
@@ -64,6 +76,25 @@ exports.getWorkshopDetails = async (req, res, next) => {
             delete coCoordinatorDetails['password'];
             responseData['co_coordinator_details'] = coCoordinatorDetails;
         }
+
+        //finding the files associated with the workshop
+        const workshopMediaPhotos = await WorkshopMediaPhotos.findWorkshopMediaPhtotos(workshopId);
+        result = getAllResults(workshopMediaPhotos);
+        responseData['files_url']['media_photos'] = result.map(file => file['media_photo_url']);
+
+        const workshopPhotos = await WorkshopPhotos.findWorkshopPhotos(workshopId);
+        result = getAllResults(workshopPhotos);
+        responseData['files_url']['workshop_photos'] = result.map(file => file['photo_url']);
+
+        const workshopOtherDocs = await WorkshopOtherDocs.findDocumentsByWorkshopId(workshopId);
+        result = getFirstResult(workshopOtherDocs);
+        
+        if(result) {
+            responseData['files_url']['other_docs']['report'] = result['report_url'];
+            responseData['files_url']['other_docs']['certificate'] = result['certificate_url'];
+            responseData['files_url']['other_docs']['stmt_expenditure'] = result['stmt_expenditure_url'];
+        }
+
         res.status(200).json({
             msg: "Workshop details successfully fetched!",
             data: responseData

@@ -4,7 +4,7 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 
 const client = require('twilio')(accountSID, authToken);
 const Twilio = require("../models/twilio");
-const { throwError } = require('./helper');
+const { throwError } = require('../utils/helper');
 
 exports.createTwilioSMSService = async () => {
     try{

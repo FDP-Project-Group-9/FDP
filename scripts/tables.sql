@@ -173,15 +173,15 @@ create table workshops (
 	FOREIGN KEY (co_coordinator_id) REFERENCES users(user_id),
 	FOREIGN KEY (institute_id) REFERENCES institute(id),
 );
-GO
 
 ALTER TABLE workshop_details 
 ADD FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id);
-GO
 
 ALTER TABLE workshops
 ADD FOREIGN KEY (workshop_details_id) REFERENCES workshop_details(id);
+
 GO
+
 
 --attendace table
 IF OBJECT_ID(N'attendance', N'U') is null
@@ -225,5 +225,37 @@ IF OBJECT_ID(N'twilio', N'U') is NULL
 CREATE TABLE twilio (
 	id int IDENTITY(1, 1),
 	sid varchar(255) NOT NULL
+);
+GO
+
+IF OBJECT_ID(N'workshop_media_photos', N'U') is null
+CREATE TABLE workshop_media_photos (
+	id int IDENTITY(1, 1),
+	media_photo_url varchar(255) NOT NULL,
+	workshop_id int NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id)
+);
+GO
+
+IF OBJECT_ID(N'workshop_photos', N'U') is null
+CREATE TABLE workshop_photos (
+	id int IDENTITY(1, 1),
+	photo_url varchar(255) NOT NULL,
+	workshop_id int NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id)
+);
+GO
+
+IF OBJECT_ID(N'workshop_other_docs', N'U') is null
+CREATE TABLE workshop_other_docs (
+	id int IDENTITY(1, 1),
+	report_url varchar(255),
+	stmt_expenditure_url varchar(255),
+	certificate_url varchar(255),
+	workshop_id int NOT NULL UNIQUE,
+	PRIMARY KEY (id),
+	FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id)
 );
 GO

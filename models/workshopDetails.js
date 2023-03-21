@@ -144,5 +144,21 @@ module.exports = class WorkshopDetails {
         }
     };
 
-    
+    static async approveWorkshop(workshopId) {
+        const db = getDB();
+        const queryStmt = `UPDATE ${tableNames.WORKSHOP_DETAILS} 
+            SET
+            ${colNames.workshopApprovalStatus} = ${'@' + colNames.workshopApprovalStatus}
+            WHERE ${colNames.workshopId} = ${'@' + colNames.workshopId}`;
+
+        try{
+            return await db.request()
+            .input(colNames.workshopId, dbTypes.Int, workshopId)
+            .input(colNames.workshopApprovalStatus, dbTypes.Bit, true)
+            .query(queryStmt);
+        }
+        catch(err){
+            throwError(err.originalError.info.message, 500);
+        }
+    }
 };
