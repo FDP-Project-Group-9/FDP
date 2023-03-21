@@ -3,14 +3,13 @@ const express = require('express');
 const createWorkshopRoutes = require('./createWorkshop');
 const uploadWorkshopFilesRoutes = require('./workshopUploads');
 const deleteWorkshopFilesRoutes = require('./workshopDeleteFile');
+const quizRoutes=require('./quiz');
 
 const { addWorkshopSpecialization, getWorkshopSpecializations } = require('../controllers/workshopSpecialization');
 const { verifyCoordinatorRole, verifyAdministratorRole } = require('../middlewares/userAuthorization');
 const { addWorkshopSpecializationValidations } = require("../middlewares/workshopSpecializationValidations");
 const { getWorkshopDetails, getAllWorkshops, getUserWorkshops } = require("../controllers/showWorkshop")
 const { validationErrorHandler } = require('../utils/helper');
-const createWorkshopRoutes = require('./createWorkshop');
-const quizRoutes=require('./quiz');
 const { approveWorkshop } = require('../controllers/createWorkshop');
 const { workshopIdValidation } = require('../middlewares/workshopCreationValidations');
 const { checkIfWorkshopExists } = require('../middlewares/workshop');
