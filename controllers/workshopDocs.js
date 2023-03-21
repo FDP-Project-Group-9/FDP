@@ -3,7 +3,8 @@ const WorkshopPhotos = require('../models/workshopPhotos');
 const WorkshopOtherDocs = require('../models/workshopOtherDocs');
 
 const { throwError } = require('../utils/helper');
-const { workshop_other_docs, workshop_media_photos, workshop_photos} = require('../utils/constants');
+const { workshop_other_docs, workshop_photos, workshop_media_photos } = require('../utils/constants');
+const { removeFileByPath } = require('../config/fileDirectory');
 
 const { WORKSHOP } = require('../utils/constants').fileUploadNames;
 
@@ -179,6 +180,115 @@ exports.addWorkshopStmtOfExpenditure = async (req, res, next) => {
         await workshopOtherDocs.addWorkshopReport();
         res.status(201).json({
             msg: "Uploaded report for the workshop"
+        });
+    }
+    catch(err) {
+        next(err);
+    }
+};
+
+exports.deleteWorkshopImage = async (req, res, next) => {
+    const fileId = req.body['file_id'];
+    const workshopId = req.body['workshop_id'];
+    try {
+        const fileDetails = await WorkshopPhotos.findFileById(fileId, workshopId);
+        if(fileDetails.recordset.length == 0){
+            throwError("File not found!", 404);
+        }
+
+        removeFileByPath(fileDetails.recordset[0][workshop_photos.colNames.photoUrl]);
+
+        await WorkshopPhotos.deleteWorkshopPhotos(fileId, workshopId);
+        res.status(200).json({
+            msg: "File deleted successfully!"
+        });
+    }
+    catch(err) {
+        next(err);
+    }
+};
+
+exports.deleteWorkshopMediaImage = async (req, res, next) => {
+    const fileId = req.body['file_id'];
+    const workshopId = req.body['workshop_id'];
+
+    try {
+        const fileDetails = await WorkshopMediaPhotos.findWorkshopMediaImageById(fileId, workshopId);
+        if(fileDetails.recordset.length == 0){
+            throwError("File not found!", 404);
+        }
+
+        removeFileByPath(fileDetails.recordset[0][workshop_media_photos.colNames.mediaPhotoUrl]);
+
+        await WorkshopMediaPhotos.deleteMediaPhotos(fileId, workshopId);
+        res.status(200).json({
+            msg: "File deleted successfully!"
+        });
+    }
+    catch(err) {
+        next(err);
+    }
+};
+
+exports.deleteWorkshopReport = async (req, res, next) => {
+    const fileId = req.body['file_id'];
+    const workshopId = req.body['workshop_id'];
+
+    try {
+        const fileDetails = await WorkshopOtherDocs.findDocumentsByWorkshopId(workshopId);
+        if(fileDetails.recordset.length == 0 || !fileDetails.recordset[0][workshop_other_docs.colNames.reportUrl]){
+            throwError("File not found!", 404);
+        }
+
+        removeFileByPath(fileDetails.recordset[0][workshop_other_docs.colNames.reportUrl]);
+
+        await WorkshopOtherDocs.deleteWorkshopReport(fileId, workshopId);
+        res.status(200).json({
+            msg: "File deleted successfully!"
+        });
+    }
+    catch(err) {
+        next(err);
+    }
+};
+
+exports.deleteWorkshopCertificate = async (req, res, next) => {
+    const fileId = req.body['file_id'];
+    const workshopId = req.body['workshop_id'];
+
+    try {
+        const fileDetails = await WorkshopOtherDocs.findDocumentsByWorkshopId(workshopId);
+        if(fileDetails.recordset.length == 0 || !fileDetails.recordset[0][workshop_other_docs.colNames.certificateUrl]){
+            throwError("File not found!", 404);
+        }
+
+        removeFileByPath(fileDetails.recordset[0][workshop_other_docs.colNames.certificateUrl]);
+
+        await WorkshopOtherDocs.deleteWorkshopCertificate(fileId, workshopId);
+        res.status(200).json({
+            msg: "File deleted successfully!"
+        });
+    }
+    catch(err) {
+        next(err);
+    }
+};
+
+exports.deleteWorkshopStmtOfExpenditure = async (req, res, next) => {
+    const fileId = req.body['file_id'];
+    const workshopId = req.body['workshop_id'];
+
+    try {
+        const fileDetails = await WorkshopOtherDocs.findDocumentsByWorkshopId(workshopId);
+        if(fileDetails.recordset.length == 0 || !fileDetails.recordset[0][workshop_other_docs.colNames.stmtExpenditureUrl]){
+            throwError("File not found!", 404);
+        }
+
+        removeFileByPath(fileDetails.recordset[0][workshop_other_docs.colNames.stmtExpenditureUrl]);
+
+        await WorkshopOtherDocs.deleteWorkshopStmtOfExpenditure(fileId, workshopId);
+        res.status(200).json({
+            msg: "File deleted successfully!"
         });
     }
     catch(err) {

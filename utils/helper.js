@@ -35,3 +35,11 @@ exports.validationErrorHandler = (req, res, next) => {
     }
     next();
 };
+
+exports.getAllResults = (sqlQueryResult) => {
+    return sqlQueryResult.recordsets[0];
+};
+
+exports.getFirstResult = (sqlQueryResult) => {
+    return sqlQueryResult.recordset[0];
+};

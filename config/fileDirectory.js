@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { throwError } = require('../utils/helper');
 
 const createUserDocsDirectory = () => {
     fs.stat("./files/user-docs", err => {
@@ -61,7 +62,7 @@ const createWorkshopCertificateDirectory = () => {
               console.log(error);
             }
           });
-        }
+        } 
     });
 };
 
@@ -120,4 +121,8 @@ exports.removeFiles = (files) => {
             }
         });
     });
+};
+
+exports.removeFileByPath = (filePath) => {
+  fs.rmSync(filePath);
 };

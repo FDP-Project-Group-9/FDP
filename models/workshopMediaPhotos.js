@@ -31,17 +31,20 @@ module.exports = class WorkshopMediaPhotos {
         }
     };
 
-    static async deleteMediaPhotos (photoId) {
+    static async deleteMediaPhotos (photoId, workshopId) {
         const db = getDB();
         const queryStmt = `DELETE FROM 
             ${tableNames.WORKSHOP_MEDIA_PHOTOS}
             WHERE 
             ${colNames.id} = ${'@' + colNames.id}
+            AND
+            ${colNames.workshopId} = ${'@' + colNames.workshopId}
         `;
 
         try {
             return await db.request()
             .input(colNames.id, dbTypes.Int, photoId)
+            .input(colNames.workshopId, dbTypes.Int, workshopId)
             .query(queryStmt);
         }
         catch(err) {
@@ -66,4 +69,25 @@ module.exports = class WorkshopMediaPhotos {
             throwError(err.originalError.info.message, 500);
         }
     };
+
+    static async findWorkshopMediaImageById (fileId, workshopId) {
+        const db = getDB();
+        const queryStmt = `SELECT * FROM 
+            ${tableNames.WORKSHOP_MEDIA_PHOTOS}
+            WHERE 
+            ${colNames.id} = ${'@' + colNames.id}
+            AND
+            ${colNames.workshopId} = ${'@' + colNames.workshopId}
+        `;
+
+        try {
+            return await db.request()
+            .input(colNames.id, dbTypes.Int, fileId)
+            .input(colNames.workshopId, dbTypes.Int, workshopId)
+            .query(queryStmt);
+        }
+        catch(err) {
+            throwError(err.originalError.info.message, 500);
+        }
+    }
 };

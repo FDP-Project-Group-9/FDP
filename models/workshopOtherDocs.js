@@ -33,17 +33,23 @@ module.exports = class WorkshopOtherDocs {
         }
     };
 
-    static async deleteWorkshopReport (reportId) {
+    static async deleteWorkshopReport (fileId, workshopId) {
         const db = getDB();
-        const queryStmt = `DELETE FROM
+        const queryStmt = `UPDATE 
             ${tableNames.WORKSHOP_OTHER_DOCS}
-            WHERE
+            SET
             ${colNames.reportUrl} = ${'@' + colNames.reportUrl}
+            WHERE
+            ${colNames.id} = ${'@' + colNames.id}
+            AND 
+            ${colNames.workshopId} = ${'@' + colNames.workshopId}
         `;
 
         try {
             return await db.request()
-            .input(colNames.reportUrl, dbTypes.VarChar(255), reportId)
+            .input(colNames.reportUrl, dbTypes.VarChar(255), null)
+            .input(colNames.id, dbTypes.Int, fileId)
+            .input(colNames.workshopId, dbTypes.Int, workshopId)
             .query(queryStmt);
         }
         catch(err) {
@@ -76,17 +82,23 @@ module.exports = class WorkshopOtherDocs {
         }
     };
 
-    static async deleteWorkshopCertificate(certificateId) {
+    static async deleteWorkshopCertificate(fileId, workshopId) {
         const db = getDB();
-        const queryStmt = `DELETE FROM
+        const queryStmt = `UPDATE
             ${tableNames.WORKSHOP_OTHER_DOCS}
-            WHERE
+            SET
             ${colNames.certificateUrl} = ${'@' + colNames.certificateUrl}
+            WHERE
+            ${colNames.id} = ${'@' + colNames.id}
+            AND
+            ${colNames.workshopId} = ${'@' + colNames.workshopId}
         `;
 
         try {
             return await db.request()
-            .input(colNames.certificateUrl, dbTypes.VarChar(255), certificateId)
+            .input(colNames.certificateUrl, dbTypes.VarChar(255), null)
+            .input(colNames.id, dbTypes.Int, fileId)
+            .input(colNames.workshopId, dbTypes.Int, workshopId)
             .query(queryStmt);
         }
         catch(err) {
@@ -120,17 +132,23 @@ module.exports = class WorkshopOtherDocs {
     };
 
 
-    static async deleteWorkshopStmtOfExpenditure(stmtOfExpenditureId) {
+    static async deleteWorkshopStmtOfExpenditure(fileId, workshopId) {
         const db = getDB();
-        const queryStmt = `DELETE FROM
+        const queryStmt = `UPDATE
             ${tableNames.WORKSHOP_OTHER_DOCS}
-            WHERE
+            SET
             ${colNames.stmtExpenditureUrl} = ${'@' + colNames.stmtExpenditureUrl}
+            WHERE
+            ${colNames.id} = ${'@' + colNames.id}
+            AND
+            ${colNames.workshopId} = ${'@' + colNames.workshopId}
         `;
 
         try {
             return await db.request()
-            .input(colNames.stmtExpenditureUrl, dbTypes.VarChar(255), stmtOfExpenditureId)
+            .input(colNames.stmtExpenditureUrl, dbTypes.VarChar(255), null)
+            .input(colNames.id, dbTypes.Int, fileId)
+            .input(colNames.workshopId, dbTypes.Int, workshopId)
             .query(queryStmt);
         }
         catch(err) {

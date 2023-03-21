@@ -2,6 +2,7 @@ const express = require('express');
 
 const createWorkshopRoutes = require('./createWorkshop');
 const uploadWorkshopFilesRoutes = require('./workshopUploads');
+const deleteWorkshopFilesRoutes = require('./workshopDeleteFile');
 
 const { addWorkshopSpecialization, getWorkshopSpecializations } = require('../controllers/workshopSpecialization');
 const { verifyCoordinatorRole, verifyAdministratorRole } = require('../middlewares/userAuthorization');
@@ -10,6 +11,7 @@ const { getWorkshopDetails, getAllWorkshops, getUserWorkshops } = require("../co
 const { validationErrorHandler } = require('../utils/helper');
 const { approveWorkshop } = require('../controllers/createWorkshop');
 const { workshopIdValidation } = require('../middlewares/workshopCreationValidations');
+const { checkIfWorkshopExists } = require('../middlewares/workshop');
 
 const routes = express.Router();
 
@@ -18,6 +20,9 @@ routes.use("/create-workshop", verifyCoordinatorRole, createWorkshopRoutes);
 
 //routes for uploading workshop files
 routes.use("/upload", verifyCoordinatorRole, uploadWorkshopFilesRoutes);
+
+//routes for deleting workshop files
+routes.use("/delete", verifyCoordinatorRole, checkIfWorkshopExists, deleteWorkshopFilesRoutes);
 
 // workshop specializations routes
 routes.post("/specialization", verifyCoordinatorRole, addWorkshopSpecializationValidations(), validationErrorHandler, addWorkshopSpecialization);
