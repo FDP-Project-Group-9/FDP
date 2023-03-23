@@ -3,6 +3,7 @@ const sql = require('mssql');
 const { getDB } = require('../config/db');
 const { dbTypes, throwError } = require('../utils/helper'); 
 const { tableNames } = require("../utils/constants");
+const { colNames } = require("../utils/constants").user_docs;
  
 module.exports = class UserDocs {
     static async addDocumentsForUser(userId, files) {
@@ -25,4 +26,22 @@ module.exports = class UserDocs {
             throwError("Something went wrong while storing user documents!", 500);
         }
     };  
+
+    static async findUserDocs(userId) {
+        const db = getDB(); 
+        const queryStmt = `SELECT * FROM 
+            ${tableNames.USERDOCS}
+            WHERE
+            ${colNames.userId} = ${'@' + colNames.userId}
+        `;
+
+        try {
+            return await db.request()
+            .input(colNames.userId, dbTypes.Int, userId)
+            .query(queryStmt);
+        }
+        catch(err) {
+            throwError(err.originalError.info.message, 500);
+        }
+    };
 };

@@ -61,19 +61,32 @@ exports.login= async(req,res,next)=>{
         const user_details=await User.findUserByEmail(emailId);
         const user=user_details.recordsets[0][0];
 
-        // if(user.profile_approved!==true){
-        //     throwError("Registration of User is not approved", 403);
-        // }
-
+        if(user.profile_approved!==true){
+            const userDocsDetails = await UserDocs.findUserDocs(user.user_id);
+            if(userDocsDetails.recordsets[0].length == 0)
+                throwError("Please upload identity documents for signup verification!", 404);
+            throwError("Registration of User is not approved", 403);
+        }
+        const roleDetails = await Role.findRole(user.role_id);
+        if(roleDetails.recordset.length == 0)
+            throwError("Role not found for user!", 404);
+        const roleName = roleDetails.recordset[0]['role_name'];
         bycrypt.compare(password,user.password)
         .then(isMatch =>{
             if(isMatch){
-                const payload={id:user.user_id,email:user.email_id,role_id:user.role_id}
+                const payload={
+                                id: user.user_id,
+                                email: user.email_id,
+                                role_id: user.role_id,
+                                role_name: roleName,
+                                profile_approved: user.profile_approved,
+                            };
                 //Sign Token
                 jwt.sign(payload,process.env.SECRET_KEY, { expiresIn: '1d' },(err,token)=>{
                     return res.status(200).json({
                         success:true,
-                        token:'Bearer '+ token
+                        token:'Bearer '+ token,
+                        msg: "Successfully LoggedIn!"
                     });
                 });
             }

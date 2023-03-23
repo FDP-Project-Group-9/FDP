@@ -34,6 +34,14 @@ exports.tableNames = {
     WORKSHOP_OTHER_DOCS: 'workshop_other_docs'
 };
 
+exports.user_docs = {
+    colNames: {
+        id: 'id',
+        filePath: 'file_path',
+        userId: 'user_id'
+    }
+};
+
 exports.workshop = {
     colNames: {
         workshopId: 'workshop_id',
