@@ -13,7 +13,7 @@ const resourcePersonRoutes=require('./routes/resoucePerson')
 const { connectDB } = require('./config/db');
 const { passportMiddleware, authenticateJWT } = require('./middlewares/passport');
 const { createTwilioSMSService } = require('./config/otp');
-const { verifyCoordinatorRole } = require('./middlewares/userAuthorization');
+const { verifyCoordinatorRole, checkIfUserIsApproved } = require('./middlewares/userAuthorization');
 const { createFilesDirectory, removeFiles } = require('./config/fileDirectory');
 
 const port = process.env.PORT || 5000;
@@ -36,10 +36,10 @@ app.use((req, res, next) => {
 app.use('/ums', onBoardingRoutes);
 
 // workshop routes  
-app.use('/workshop',authenticateJWT, workshopRoutes);
+app.use('/workshop',authenticateJWT, checkIfUserIsApproved, workshopRoutes);
 
 // Resource Person routes
-app.use('/resource-person', authenticateJWT, verifyCoordinatorRole, resourcePersonRoutes);
+app.use('/resource-person', authenticateJWT, checkIfUserIsApproved, verifyCoordinatorRole, resourcePersonRoutes);
 
 // error handler
 app.use((error, req, res, next) => {

@@ -179,6 +179,53 @@ exports.loginValidationRules=()=>{
     ]
 };
 
+exports.updateUserDetailsRules = () => {
+    return [
+        body("dob")
+            .if(value => !!value)
+            .isDate("YYYY-MM-DD")
+            .withMessage("Incorrect date format!")
+        ,
+        body("title")
+            .exists()
+            .withMessage("Title is required!")
+        ,
+        body("mobile_no")
+            .exists()
+            .withMessage("Mobile Number is required!")
+            .bail()
+            .isLength({min: 10, max: 10})
+            .withMessage("Mobile Number should contain 10 digits!")
+            .bail()
+            .isNumeric()
+            .withMessage("Mobile Number should only contain numbers!")
+            .custom( async (mobileNo, { req }) => {
+                try {
+                    const result = await User.findUserByMobile(mobileNo);
+                    if(result.recordset.length > 0 && result.recordset[0].user_id != req.params.userId)
+                        return Promise.reject(
+                            {
+                                errorMsg: "User with mobile number already exists!",
+                                status: 409
+                            }
+                        );
+                }
+                catch(err){
+                    return Promise.reject(
+                        {
+                            errorMsg: err.msg,
+                            status: err.status
+                        }
+                    );
+                }
+            })
+        ,
+        body("gender")
+            .exists()
+            .withMessage("Gender is required!")
+    ];
+};
+
 exports.uploadFilesValidationRules = () => {
     return [
         body("email_id")

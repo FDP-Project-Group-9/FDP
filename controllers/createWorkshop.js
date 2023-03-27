@@ -37,6 +37,7 @@ exports.createWorkshopDraft = async (req, res, next) => {
 exports.putCoordinatorDetails = async (req, res, next) => {
     const user = res.locals.user;
     const edit = req.query.edit;
+    const updateWorkshop = req.query.update_workshop;
     const userId = user['user_id'];
     const workshopId = req.body['workshop_id'];
     const coCoordinatorEmailId = req.body['co_coordinator_email_id'];
@@ -86,16 +87,18 @@ exports.putCoordinatorDetails = async (req, res, next) => {
         }
     }
 
-    //check if the user creating/ modifying the details is the owner
+    //check if the user creating/ modifying the details is the owne
     try{
-        workshopInfo = await Workshop.getWorkshopDetails(workshopId);
-        if(workshopInfo.recordset.length == 0){
-            throwError("Workshop not found!", 404);
-        }
-
-        workshopInfo = workshopInfo.recordset[0];
-        if(workshopInfo['coordinator_id'] != userId){
-            throwError("User is not the owner of the workshop!", 403);
+        if(updateWorkshop?.toLowerCase() == 'true') {
+            workshopInfo = await Workshop.getWorkshopDetails(workshopId);
+            if(workshopInfo.recordset.length == 0){
+                throwError("Workshop not found!", 404);
+            }
+    
+            workshopInfo = workshopInfo.recordset[0];
+            if(workshopInfo['coordinator_id'] != userId){
+                throwError("User is not the owner of the workshop!", 403);
+            }
         }
 
         //find coordinator details if it exists
@@ -118,7 +121,9 @@ exports.putCoordinatorDetails = async (req, res, next) => {
                 co_coordinator_id: coCoordinatorId, 
                 workshop_id: workshopId
             };
-            await Workshop.updateWorkshop(data);
+            if(updateWorkshop?.toLowerCase() == 'true') {
+                await Workshop.updateWorkshop(data);
+            }
             res.status(200).json({
                 msg: "Coordinator details updated successfully!"
             });
@@ -141,7 +146,9 @@ exports.putCoordinatorDetails = async (req, res, next) => {
                 co_coordinator_id: coCoordinatorId, 
                 workshop_id: workshopId
             };
-            await Workshop.updateWorkshop(data);
+            if(updateWorkshop?.toLowerCase() == 'true') {
+                await Workshop.updateWorkshop(data);
+            }
             res.status(201).json({
                 msg: "Coordinator details added successfully!"
             });
@@ -156,6 +163,7 @@ exports.putInstituteDetails = async (req, res, next) => {
     const user = res.locals.user;
     const userId = user['user_id'];
     const edit = req.query.edit;
+    const updateWorkshop = req.query.update_workshop;
     const workshopId = req.body['workshop_id'];
 
     const requestData = {
@@ -173,14 +181,16 @@ exports.putInstituteDetails = async (req, res, next) => {
 
     //check if the user creating/ modifying the details is the owner
     try{
-        workshopInfo = await Workshop.getWorkshopDetails(workshopId);
-        if(workshopInfo.recordset.length == 0){
-            throwError("Workshop not found!", 404);
-        }
+        if(updateWorkshop?.toLowerCase() == 'true'){
+            workshopInfo = await Workshop.getWorkshopDetails(workshopId);
+            if(workshopInfo.recordset.length == 0){
+                throwError("Workshop not found!", 404);
+            }
 
-        workshopInfo = workshopInfo.recordset[0];
-        if(workshopInfo['coordinator_id'] != userId){
-            throwError("User is not the owner of the workshop!", 403);
+            workshopInfo = workshopInfo.recordset[0];
+            if(workshopInfo['coordinator_id'] != userId){
+                throwError("User is not the owner of the workshop!", 403);
+            }
         }
 
         // find institute details if it exists
@@ -204,7 +214,9 @@ exports.putInstituteDetails = async (req, res, next) => {
                 institute_id: instituteId, 
                 workshop_id: workshopId
             };
-            await Workshop.updateWorkshop(data);
+            if(updateWorkshop?.toLowerCase() == 'true'){
+                await Workshop.updateWorkshop(data);
+            }
             res.status(200).json({
                 msg: "Insitute Details updated successfully!"
             });
@@ -227,7 +239,9 @@ exports.putInstituteDetails = async (req, res, next) => {
                 institute_id: instituteId, 
                 workshop_id: workshopId
             };
-            await Workshop.updateWorkshop(data);
+            if(updateWorkshop?.toLowerCase() == 'true'){
+                await Workshop.updateWorkshop(data);
+            }
             res.status(201).json({
                 msg: "Insitute details added successfully!"
             });

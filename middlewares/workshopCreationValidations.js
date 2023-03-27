@@ -17,6 +17,7 @@ exports.getWorkshopDraftValidations = () => {
 exports.coordinatorDetailsValidations = () => {
     return [
         body("workshop_id")
+            .if((value, req) => req.query.update_workshop?.toLowerCase() == 'true')
             .exists()
             .withMessage("Workshop id is required!")
         ,
@@ -88,6 +89,7 @@ exports.coordinatorDetailsValidations = () => {
 exports.insituteDetailsValidations = () => {
     return [
         body("workshop_id")
+            .if((value, req) => req.query.update_workshop?.toLowerCase() == 'true')
             .exists()
             .withMessage("Workshop id is required!")
         ,

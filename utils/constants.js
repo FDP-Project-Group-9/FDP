@@ -34,6 +34,23 @@ exports.tableNames = {
     WORKSHOP_OTHER_DOCS: 'workshop_other_docs'
 };
 
+exports.user = { 
+    colNames: {
+        userId: 'user_id',
+        firstName: 'first_name',
+        lastName: 'last_name',
+        emailId: 'email_id',
+        mobileNo: 'mobile_no',
+        dob: 'dob',
+        title: 'title',
+        password: 'password',
+        gender: 'gender',
+        roleId: 'role_id',
+        profileApproved: 'profile_approved',
+        roleName: 'role_name'
+    }
+}
+
 exports.user_docs = {
     colNames: {
         id: 'id',

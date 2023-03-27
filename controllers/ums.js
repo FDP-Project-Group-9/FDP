@@ -5,11 +5,15 @@ const jwt=require('jsonwebtoken')
 const User = require('../models/user');
 const UserDocs = require("../models/userDocs");
 const Role = require("../models/roles");
+const Institute = require('../models/institute');
 
 const { throwError } = require('../utils/helper');
 const { emailGenerator } = require('../config/email');
 const { roles } = require("../utils/constants"); 
 const { removeFiles } = require('../config/fileDirectory');
+const CoordinatorDetails = require('../models/coordinatorDetails');
+const { colNames } = require('../utils/constants').user;
+
 
 exports.signup = ( async (req, res, next) => {
     const firstName = req.body["first_name"];
@@ -108,13 +112,32 @@ exports.userDetails=async (req,res,next)=>{
     const id=req.params.id
     try{
         const user_details=await User.findUserById(id);
-        const user=user_details.recordsets[0][0];
+        let user=user_details.recordsets[0][0];
         if(user)
             delete user.password;
         if(!user){
             throwError("Invalid User id", 400);
         }
-        return res.status(200).json({user:user})
+
+        if(user[colNames.roleName] == roles.COORDINATOR) {
+            const coordinatorDetails = await CoordinatorDetails.findDetails(user[colNames.userId]);
+            if(coordinatorDetails.recordset[0]) {
+                delete coordinatorDetails.recordset[0].coordinator_id;
+                delete coordinatorDetails.recordset[0].id;
+                user = {...user, ...coordinatorDetails.recordset[0]};
+            }
+        }
+
+        const instituteDetails = (await Institute.findDetails(user[colNames.userId])).recordset[0];
+        if(instituteDetails)
+            delete instituteDetails['coordinator_id'];
+        const data = {
+            personal_details: user,
+            institute_details: instituteDetails || null
+        };
+        return res.status(200).json({
+            data: data
+        });
     }
     catch(err){
         return next(err);
@@ -138,7 +161,28 @@ exports.authorize=async(req,res,next)=>{
     }
 }
 
+exports.updateProfile = async (req, res, next) => {
+    const userId = req.params.userId;
+    const data = {
+        [colNames.dob]: req.body[colNames.dob],
+        [colNames.title]: req.body[colNames.title],
+        [colNames.mobileNo]: req.body[colNames.mobileNo],
+        [colNames.gender]: req.body[colNames.gender]
+    };
 
+    try {
+        if(userId != res.locals.user[colNames.userId]) {
+            throwError("Cannot edit other user's profile!", 403);
+        }
+        await User.updateUserDetails(userId, data);
+        res.status(200).json({
+            msg: "Profile details updated!"
+        });
+    }
+    catch(err) {
+        return next(err);
+    }
+};
 
 exports.uploadFiles = async (req, res, next) => { 
     const emailId = req.body['email_id'];

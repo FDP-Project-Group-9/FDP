@@ -1,6 +1,7 @@
 const { getDB } = require('../config/db');
 const { dbTypes, throwError } = require('../utils/helper');
 const { tableNames } = require("../utils/constants");
+const { colNames } = require('../utils/constants').user;
 
 module.exports = class User {
 
@@ -161,5 +162,31 @@ module.exports = class User {
     catch(err){
       throwError(err.originalError.info.message, 500);
     };
+  };
+
+  static async updateUserDetails (userId, data) {
+    const db = getDB();
+    const queryStmt = `UPDATE
+      ${tableNames.USERS}
+      SET
+      ${colNames.title} = ${'@' + colNames.title},
+      ${colNames.dob} = ${'@' + colNames.dob},
+      ${colNames.mobileNo} = ${'@' + colNames.mobileNo},
+      ${colNames.gender} = ${'@' + colNames.gender}
+      WHERE
+      ${colNames.userId} = ${'@' + colNames.userId}
+    `;
+    try {
+      return await db.request()
+      .input(colNames.title, dbTypes.VarChar(5), data[colNames.title])
+      .input(colNames.dob, dbTypes.Date, data[colNames.dob])
+      .input(colNames.mobileNo, dbTypes.VarChar(10), data[colNames.mobileNo])
+      .input(colNames.gender, dbTypes.VarChar(10), data[colNames.gender])
+      .input(colNames.userId, dbTypes.Int, userId)
+      .query(queryStmt);
+    }
+    catch(err) {
+      throwError(err.originalError.info.message, 500);
+    }
   };
 };
