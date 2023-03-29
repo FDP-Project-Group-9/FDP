@@ -2,6 +2,7 @@ const { getDB } = require("../config/db");
 const { dbTypes, throwError } = require("../utils/helper");
 const { tableNames } = require("../utils/constants");
 const { colNames } = require("../utils/constants").workshop;
+const { colNames: workshopDetailsColNames } = require("../utils/constants").workshop_details;
 
 module.exports = class Workshop {
     constructor(coordinatorId, instituteId) {
@@ -92,9 +93,33 @@ module.exports = class Workshop {
         }
     };
 
-    static async getAllUserWorkshops(userId, incomplete) {
+    // static async getTotalRecordsNumber(incomplete,)
+
+    static async getAllUserWorkshops(userId, incomplete, offset = 0, limit = 10) {
         const db = getDB();
-        let queryStmt = `SELECT * FROM ${tableNames.WORKSHOP} WHERE ${colNames.coordinatorId} = ${'@' + colNames.coordinatorId}`;
+        let queryStmt = `SELECT
+            ${tableNames.WORKSHOP}.${colNames.workshopId},
+            ${colNames.draft},
+            ${workshopDetailsColNames.beginDate},
+            ${workshopDetailsColNames.endDate},
+            ${workshopDetailsColNames.title},
+            ${workshopDetailsColNames.workshopApprovalStatus},
+            ${workshopDetailsColNames.workshopCompleted},
+            ${tableNames.WORKSHOP_SPECIALIZATION}.specialization
+            FROM 
+            ${tableNames.WORKSHOP} 
+            LEFT JOIN
+            ${tableNames.WORKSHOP_DETAILS}
+            ON 
+            ${tableNames.WORKSHOP}.${colNames.workshopId} = ${tableNames.WORKSHOP_DETAILS}.${colNames.workshopId}
+            LEFT JOIN 
+            ${tableNames.WORKSHOP_SPECIALIZATION}
+            ON
+            ${tableNames.WORKSHOP_DETAILS}.${workshopDetailsColNames.areaSpecializationId} = ${tableNames.WORKSHOP_SPECIALIZATION}.id
+            WHERE 
+            ${colNames.coordinatorId} = ${'@' + colNames.coordinatorId}
+        `;
+        let queryStmt2 = `SELECT count(*) as total_rows FROM ${tableNames.WORKSHOP} WHERE ${colNames.coordinatorId} = ${'@' + colNames.coordinatorId}`;
 
         if(incomplete){
             if(incomplete.toLowerCase() == 'false')
@@ -103,13 +128,26 @@ module.exports = class Workshop {
                 incomplete = true;
 
             queryStmt += ` AND ${colNames.draft} = ${'@' + colNames.draft}`;
+            queryStmt2 += ` AND ${colNames.draft} = ${'@' + colNames.draft}`;
         }
 
+        queryStmt += `
+            ORDER BY ${tableNames.WORKSHOP}.${colNames.workshopId}
+            OFFSET ${offset} ROWS
+            FETCH NEXT ${limit} ROWS ONLY
+        `;
+
         try{
-            return await db.request()
-            .input(colNames.coordinatorId, dbTypes.Int, userId)
-            .input(colNames.draft, dbTypes.Bit, incomplete)
-            .query(queryStmt);
+            return await Promise.all([
+                db.request()
+                    .input(colNames.coordinatorId, dbTypes.Int, userId)
+                    .input(colNames.draft, dbTypes.Bit, incomplete)
+                    .query(queryStmt),
+                db.request()
+                    .input(colNames.coordinatorId, dbTypes.Int, userId)
+                    .input(colNames.draft, dbTypes.Bit, incomplete)
+                    .query(queryStmt2)
+            ]);
         }
         catch(err){
             throwError(err.originalError.info.message, 500);   

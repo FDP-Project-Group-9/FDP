@@ -131,13 +131,20 @@ exports.getUserWorkshops = async (req, res, next) => {
     const incomplete = req.query.incomplete;
     const user = res.locals.user;
     const userId = user['user_id'];
+    const pageNo = Number(req.query.page_no || '0');
+    const perPage = Number(req.query.per_page || '10');
 
     let responseData;
     try{
-        const workshopDetails = await Workshop.getAllUserWorkshops(userId, incomplete);
-        responseData = workshopDetails.recordsets[0];
+        const offset = (pageNo - 1) * perPage;  
+        const workshopDetails = await Workshop.getAllUserWorkshops(userId, incomplete, offset, perPage);
+        responseData = workshopDetails[0].recordsets[0];
+        const totalWorkshopsCount = workshopDetails[1].recordset[0].total_rows;
         res.status(200).json({
-            data: responseData
+            data: {
+                workshops: responseData,
+                total_workshops_count: totalWorkshopsCount
+            }
         });
     }
     catch(err){
