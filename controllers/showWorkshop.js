@@ -37,6 +37,7 @@ exports.getWorkshopDetails = async (req, res, next) => {
         }
         workshopDetails = workshopDetails.recordset[0];
         responseData.draft = workshopDetails['draft'];
+        responseData.otp_verified = workshopDetails['otp_verified'];
 
         //find the details of coordinator from coordinator_details table
         const coordinatorId = workshopDetails['coordinator_id'];

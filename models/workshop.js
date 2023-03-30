@@ -132,7 +132,7 @@ module.exports = class Workshop {
         }
 
         queryStmt += `
-            ORDER BY ${tableNames.WORKSHOP}.${colNames.workshopId}
+            ORDER BY ${tableNames.WORKSHOP}.${colNames.workshopId} DESC
             OFFSET ${offset} ROWS
             FETCH NEXT ${limit} ROWS ONLY
         `;

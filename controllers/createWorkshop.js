@@ -437,9 +437,7 @@ exports.verifyOTP = async (req, res, next) => {
             });
         }
         else{
-            res.status(401).json({
-                msg: "Invlaid otp!"
-            });
+           throwError("Invalid OTP", 401);
         }
     }
     catch(err){
