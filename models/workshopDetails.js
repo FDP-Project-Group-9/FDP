@@ -144,7 +144,7 @@ module.exports = class WorkshopDetails {
         }
     };
 
-    static async approveWorkshop(workshopId) {
+    static async approveWorkshop(workshopId, approve) {
         const db = getDB();
         const queryStmt = `UPDATE ${tableNames.WORKSHOP_DETAILS} 
             SET
@@ -154,7 +154,7 @@ module.exports = class WorkshopDetails {
         try{
             return await db.request()
             .input(colNames.workshopId, dbTypes.Int, workshopId)
-            .input(colNames.workshopApprovalStatus, dbTypes.Bit, true)
+            .input(colNames.workshopApprovalStatus, dbTypes.Bit, approve)
             .query(queryStmt);
         }
         catch(err){

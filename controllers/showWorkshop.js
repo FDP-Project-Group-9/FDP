@@ -19,11 +19,7 @@ exports.getWorkshopDetails = async (req, res, next) => {
         files_url: {
             media_photos: [],
             workshop_photos: [],
-            other_docs: {
-                report: null,
-                stmt_expenditure: null,
-                certificate: null
-            }
+            other_docs_id: null
         }
     };
     let workshopDetails;
@@ -81,20 +77,16 @@ exports.getWorkshopDetails = async (req, res, next) => {
         //finding the files associated with the workshop
         const workshopMediaPhotos = await WorkshopMediaPhotos.findWorkshopMediaPhtotos(workshopId);
         result = getAllResults(workshopMediaPhotos);
-        responseData['files_url']['media_photos'] = result.map(file => file['media_photo_url']);
+        responseData['files_url']['media_photos'] = result.map(file => ({id: file.id}));
 
         const workshopPhotos = await WorkshopPhotos.findWorkshopPhotos(workshopId);
         result = getAllResults(workshopPhotos);
-        responseData['files_url']['workshop_photos'] = result.map(file => file['photo_url']);
+        responseData['files_url']['workshop_photos'] = result.map(file => ({id: file.id}));
 
         const workshopOtherDocs = await WorkshopOtherDocs.findDocumentsByWorkshopId(workshopId);
         result = getFirstResult(workshopOtherDocs);
         
-        if(result) {
-            responseData['files_url']['other_docs']['report'] = result['report_url'];
-            responseData['files_url']['other_docs']['certificate'] = result['certificate_url'];
-            responseData['files_url']['other_docs']['stmt_expenditure'] = result['stmt_expenditure_url'];
-        }
+        responseData['files_url']['other_docs_id'] = result?.id ?? null;
 
         res.status(200).json({
             msg: "Workshop details successfully fetched!",

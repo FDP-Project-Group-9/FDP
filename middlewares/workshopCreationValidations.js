@@ -191,5 +191,8 @@ exports.workshopIdValidation = () => {
             .exists()
             .withMessage("Workshop id is required!")
         ,
+        body("approve")
+            .exists()
+            .withMessage("Approval value is required!")
     ];
 };

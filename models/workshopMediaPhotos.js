@@ -70,20 +70,17 @@ module.exports = class WorkshopMediaPhotos {
         }
     };
 
-    static async findWorkshopMediaImageById (fileId, workshopId) {
+    static async findWorkshopMediaImageById (fileId) {
         const db = getDB();
         const queryStmt = `SELECT * FROM 
             ${tableNames.WORKSHOP_MEDIA_PHOTOS}
             WHERE 
             ${colNames.id} = ${'@' + colNames.id}
-            AND
-            ${colNames.workshopId} = ${'@' + colNames.workshopId}
         `;
 
         try {
             return await db.request()
             .input(colNames.id, dbTypes.Int, fileId)
-            .input(colNames.workshopId, dbTypes.Int, workshopId)
             .query(queryStmt);
         }
         catch(err) {
