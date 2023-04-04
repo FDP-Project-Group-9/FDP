@@ -110,17 +110,25 @@ exports.getWorkshopDetails = async (req, res, next) => {
 
 exports.getAllWorkshops = async (req, res, next) => {
     // status can be completed, ongoing, upcoming
-    const status = req.query.status;
-    // approved could be true or false
-    const approved = req.query.approved;
-    
+    const timeline_status = req.query.timeline_status;
+    // workshopApprovalStatus could be true or false
+    const workshopApprovalStatus = req.query.workshop_approval_status;
+    // query param that tells whether the request user is admin or not
+    const isUserAdmin = req.query.is_admin?.toLowerCase() === 'true' ? true : false;
+    // no of enteries per api call
+    const perPage = Number(req.query.per_page ?? 10);
+    const pageNo = Number(req.query.page_no ?? 1);
+
     let responseData;
-  
+    const offset = (pageNo - 1)*perPage;
     try{
-        const workshops = await Workshop.getAllWorkshops(status, approved);
-        responseData = workshops.recordsets[0];
+        const workshopsResponse = await Workshop.getAllWorkshops(offset, perPage, timeline_status, workshopApprovalStatus, isUserAdmin);
+        responseData = workshopsResponse[0].recordsets[0];
         res.status(200).json({
-            data: responseData
+            data: {
+                workshops: responseData,
+                total_workshops_count: workshopsResponse[1].recordset[0].total_count
+            }
         });
     }
     catch(err){
@@ -129,7 +137,9 @@ exports.getAllWorkshops = async (req, res, next) => {
 };
 
 exports.getUserWorkshops = async (req, res, next) => {
-    const incomplete = req.query.incomplete;
+    const draft = req.query.draft;
+    const workshop_approval_status = req.query.workshop_approval_status;
+    const timeline_status = req.query.timeline_status;
     const user = res.locals.user;
     const userId = user['user_id'];
     const pageNo = Number(req.query.page_no ?? 1);
@@ -138,7 +148,7 @@ exports.getUserWorkshops = async (req, res, next) => {
     let responseData;
     try{
         const offset = (pageNo - 1) * perPage;  
-        const workshopDetails = await Workshop.getAllUserWorkshops(userId, incomplete, offset, perPage);
+        const workshopDetails = await Workshop.getAllUserWorkshops(offset, perPage, userId, draft, workshop_approval_status, timeline_status);
         responseData = workshopDetails[0].recordsets[0];
         const totalWorkshopsCount = workshopDetails[1].recordset[0].total_rows;
         res.status(200).json({
