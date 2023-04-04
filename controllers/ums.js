@@ -3,7 +3,7 @@ const bycrypt = require('bcrypt');
 const jwt=require('jsonwebtoken')
 
 const User = require('../models/user');
-const UserDocs = require("../models/userDocs");
+const CoordinatorDocs = require("../models/coordinatorDocs");
 const Role = require("../models/roles");
 const Institute = require('../models/institute');
 
@@ -40,7 +40,7 @@ exports.signup = ( async (req, res, next) => {
     try{
         const result = await Role.findRole(roleId);
         if(result.recordset[0]['role_name'].toLowerCase() == roles.COORDINATOR){
-            profile_approved = false;
+            profile_approved = null;
         }
     }
     catch(err){
@@ -66,10 +66,13 @@ exports.login= async(req,res,next)=>{
         const user=user_details.recordsets[0][0];
 
         if(user.profile_approved!==true){
-            const userDocsDetails = await UserDocs.findUserDocs(user.user_id);
+            const userDocsDetails = await CoordinatorDocs.findCoordinatorDocs(user.user_id);
             if(userDocsDetails.recordsets[0].length == 0)
                 throwError("Please upload identity documents for signup verification!", 404);
-            throwError("Registration of User is not approved", 403);
+            if(user[colNames.profileApproved] == null)
+                throwError("Registration of User is not approved", 403);
+            else
+                throwError("Registration of user has been rejected by the administrator! Please reach out to the administrator", 403);
         }
         const roleDetails = await Role.findRole(user.role_id);
         if(roleDetails.recordset.length == 0)
@@ -109,10 +112,10 @@ exports.login= async(req,res,next)=>{
 
 
 exports.userDetails=async (req,res,next)=>{
-    const id=req.params.id
+    const id=req.params.id;
     try{
         const user_details=await User.findUserById(id);
-        let user=user_details.recordsets[0][0];
+        let user=user_details.recordsets[0][0], coordinatorDocs;
         if(user)
             delete user.password;
         if(!user){
@@ -126,15 +129,20 @@ exports.userDetails=async (req,res,next)=>{
                 delete coordinatorDetails.recordset[0].id;
                 user = {...user, ...coordinatorDetails.recordset[0]};
             }
+            coordinatorDocs = (await CoordinatorDocs.findCoordinatorDocs(user[colNames.userId])).recordset[0];   
         }
 
         const instituteDetails = (await Institute.findDetails(user[colNames.userId])).recordset[0];
         if(instituteDetails)
             delete instituteDetails['coordinator_id'];
+
         const data = {
             personal_details: user,
-            institute_details: instituteDetails || null
+            institute_details: instituteDetails || null,
         };
+        if(user[colNames.roleName] == roles.COORDINATOR){
+            data['documents'] = coordinatorDocs || null;
+        }
         return res.status(200).json({
             data: data
         });
@@ -144,22 +152,25 @@ exports.userDetails=async (req,res,next)=>{
     }
 }
 
-exports.authorize=async(req,res,next)=>{
+exports.approveRejectCoordinatorRegistration=async(req,res,next)=>{
+    const userId = req.body.user_id;
+    const approve = req.body.approve;
     try{
-        const authorized_user=await User.findUserById(req.params.id)
+        const authorized_user=await User.findUserById(userId)
         let authorize_user=authorized_user.recordsets[0][0];
         if(!authorize_user){
             throwError("User not found!", 404);
         }
-        const updation=await User.updateUserRoleId(true,authorize_user.user_id)
+        const updation=await User.updateUserRoleId(approve, authorize_user.user_id)
         authorize_user=await User.findUserById(req.params.id)
         authorize_user=authorized_user.recordsets[0][0]
-        return res.status(200).json({msg: "User approved!"});
+        const msg = approve ? 'Coordinator registration approved!' : 'Coordinator registration rejected!';
+        return res.status(200).json({msg: msg});
     }
     catch(err){
         return next(err);
     }
-}
+};
 
 exports.updateProfile = async (req, res, next) => {
     const userId = req.params.userId;
@@ -184,49 +195,6 @@ exports.updateProfile = async (req, res, next) => {
     }
 };
 
-exports.uploadFiles = async (req, res, next) => { 
-    const emailId = req.body['email_id'];
-    const files = req.files;
-    const attachments = files.map(file => {
-        return {
-            path: file.path,
-            contentType: file.mimetype,
-        };
-    });
-
-    try{
-        const result = await User.findUserByEmail(emailId);
-        if(result.recordset.length == 0){
-            throwError("User not found!", 404);
-        }
-        const userId = result.recordset[0]['user_id'];
-        await UserDocs.addDocumentsForUser(userId, files);
-        res.status(200).json({msg: "Files uploaded successfully!"});
-
-        try{
-            const admins = await User.findAllAdministrators();
-            const userEmailId = result.recordset[0]["email_id"];
-            const userName = result.recordset[0]["first_name"] + " " + result.recordset[0]["last_name"];
-            const adminEmails = admins.recordset.map(record => record["email_id"]).join(', ');
-            const subject = "Coordinator user verification required!";
-            const content = `
-                <h3>User Verification Required!</h3>
-                <p>Please find the attached documents to verify the user
-                 <b>${userName}<b> (${userEmailId}).
-                </p>
-            `;
-            emailGenerator(adminEmails, subject, content, attachments);
-        }
-        catch(err){
-            next(err);
-        }
-    }
-    catch(err){
-        // removing files from file system if error occurs...
-        removeFiles(files);
-        next(err);
-    }
-}
 
 exports.getRoles = async (req, res, next) => {
     try{
@@ -237,6 +205,28 @@ exports.getRoles = async (req, res, next) => {
         });
     }  
     catch(err){
+        next(err);
+    }
+};
+
+exports.getAllCoordinators = async (req, res, next) => {
+    const perPage = Number(req.query.per_page || 10);
+    const pageNo = Number(req.query.page_no || 1);
+    const profileStatus = req.query.profile_status;
+
+    try {
+        let data = [];
+        const offset = (pageNo - 1) * perPage;  
+        const result = await User.findAllCoordinators(offset, perPage, profileStatus);
+        data = [...result[0].recordsets[0]];
+        res.status(200).json({
+            data: {
+                users: data,
+                total_count: result[1].recordset[0].total_count
+            }
+        });
+    }
+    catch(err) {
         next(err);
     }
 };

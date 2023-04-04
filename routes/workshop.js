@@ -27,7 +27,7 @@ routes.use("/delete", verifyCoordinatorRole, checkIfWorkshopExists, deleteWorksh
 
 // workshop specializations routes
 routes.post("/specialization", verifyCoordinatorRole, addWorkshopSpecializationValidations(), validationErrorHandler, addWorkshopSpecialization);
-routes.get("/specializations", verifyCoordinatorRole, getWorkshopSpecializations);
+routes.get("/specializations", getWorkshopSpecializations);
 
 // approve workshop
 routes.put("/approve", verifyAdministratorRole, workshopIdValidation(), validationErrorHandler, approveWorkshop);

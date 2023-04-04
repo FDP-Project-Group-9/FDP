@@ -24,16 +24,20 @@ create table users (
 	password varchar (255) NOT NULL,
 	gender varchar (10) NOT NULL,
 	role_id int,
-	profile_approved bit DEFAULT 0,
+	profile_approved bit,
 	PRIMARY KEY (user_id),
 	FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
 GO
 
 IF OBJECT_ID(N'user_docs', N'U') is NULL
-create table user_docs (
+create table coordinator_docs (
 	id int IDENTITY(1, 1),
-	file_path varchar (255) NOT NULL,
+	registration_doc_url varchar (255) NOT NULL,
+	coordinator_mandate_form_url varchar (255),
+	coordinator_photo_url varchar (255),
+	coordinator_signature_url varchar (255),
+	institute_logo_url varchar (255),
 	user_id int NOT NULL,
 	PRIMARY KEY (id),
 	FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -146,7 +150,7 @@ create table workshop_details (
 	end_date date NOT NULL,
 	mode varchar (50) NOT NULL, --specifies the mode i.e online or offline
 	participant_intake int NOT NULL,
-	workshop_approval_status BIT DEFAULT 0,
+	workshop_approval_status BIT,
 	alloted_funds bigint,
 	expenditure bigint,
 	quiz_generated BIT default 0,

@@ -132,8 +132,8 @@ exports.getUserWorkshops = async (req, res, next) => {
     const incomplete = req.query.incomplete;
     const user = res.locals.user;
     const userId = user['user_id'];
-    const pageNo = Number(req.query.page_no || '0');
-    const perPage = Number(req.query.per_page || '10');
+    const pageNo = Number(req.query.page_no ?? 1);
+    const perPage = Number(req.query.per_page ?? 10);
 
     let responseData;
     try{

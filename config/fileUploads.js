@@ -18,9 +18,27 @@ const fileStorage = multer.diskStorage({
     },
     filename: (req, file, cb) => {
         let dir = "", fileName = ""
-        if(req.originalUrl === "/ums/upload-files"){
-        dir += "user-docs";
-        fileName = uniqueFilename(dir, file.originalname.split('.')[0] + '-' + req.body['email_id']);
+        if(req.originalUrl.includes("/ums/upload")){
+          dir += "user-docs";
+          if(req.originalUrl.includes("/registration-doc"))
+            dir += '/registration-docs';
+          if(req.originalUrl.includes("/mandate-docs")){
+            switch(file.fieldname) {
+              case USER.COORDINATOR_MANDATE_FORM: 
+                dir += '/coordinator-mandate-form';
+                break;
+              case USER.COORDINATOR_PHOTO: 
+                dir += '/coordinator-photo';
+                break;
+              case USER.COORDINATOR_SIGNATURE: 
+                dir += '/coordinator-signature';
+                break;
+              case USER.INSTITUTE_LOGO: 
+                dir += '/institute-logo';
+                break;
+            }
+          }
+          fileName = uniqueFilename(dir, file.originalname.split('.')[0] + '-' + (req.body['email_id'] || req.body.user_id));
         }
         else if(req.originalUrl.includes("/workshop/upload")) {
             dir += "workshop-docs";
@@ -59,7 +77,28 @@ const fileStorage = multer.diskStorage({
                                   limits: {
                                     fileSize: fileSize
                                   }
-                                }).array("docs");
+                                }).fields([
+                                  {
+                                    name: USER.REGISTRATION_DOC,
+                                    maxCount: 1
+                                  },
+                                  {
+                                    name: USER.COORDINATOR_MANDATE_FORM,
+                                    maxCount: 1
+                                  },
+                                  {
+                                    name: USER.COORDINATOR_PHOTO,
+                                    maxCount: 1
+                                  },
+                                  {
+                                    name: USER.COORDINATOR_SIGNATURE,
+                                    maxCount: 1
+                                  },
+                                  {
+                                    name: USER.INSTITUTE_LOGO,
+                                    maxCount: 1
+                                  }
+                                ]);
   
   //multer function for workshop documents
   exports.workshopImages = multer({

@@ -189,4 +189,74 @@ module.exports = class User {
       throwError(err.originalError.info.message, 500);
     }
   };
+
+  static async findAllCoordinators(offset = 0, limit = 10, profileStatus) {
+    const db = getDB();
+    let profileApprovedVal = true;
+    let queryStmt = `SELECT 
+      ${tableNames.USERS}.${colNames.userId},
+      ${colNames.title},
+      ${colNames.firstName},
+      ${colNames.lastName},
+      ${colNames.profileApproved},
+      ${colNames.emailId}
+      FROM
+      ${tableNames.USERS}
+      INNER JOIN
+      ${tableNames.ROLES}
+      ON
+      ${tableNames.USERS}.${colNames.roleId} = ${tableNames.ROLES}.${colNames.roleId}
+      WHERE
+      ${tableNames.ROLES}.${colNames.roleName} = 'coordinator'
+    `;
+
+    let queryStmt2 = `SELECT 
+      count(*) as total_count 
+      FROM ${tableNames.USERS} 
+      INNER JOIN
+      ${tableNames.ROLES}
+      ON
+      ${tableNames.USERS}.${colNames.roleId} = ${tableNames.ROLES}.${colNames.roleId}
+      WHERE
+      ${tableNames.ROLES}.${colNames.roleName} = 'coordinator'
+    `;
+
+    if(profileStatus) {
+      if(profileStatus.toLowerCase() === 'approved') {
+        profileApprovedVal = true;
+        queryStmt += ` AND ${tableNames.USERS}.${colNames.profileApproved} = ${'@' + colNames.profileApproved}`;
+        queryStmt2 += ` AND ${tableNames.USERS}.${colNames.profileApproved} = ${'@' + colNames.profileApproved}`;
+      }
+      else if(profileStatus.toLowerCase() === 'rejected'){
+        profileApprovedVal = false;
+        queryStmt += ` AND ${tableNames.USERS}.${colNames.profileApproved} = ${'@' + colNames.profileApproved}`;
+        queryStmt2 += ` AND ${tableNames.USERS}.${colNames.profileApproved} = ${'@' + colNames.profileApproved}`;
+      }
+      else if(profileStatus.toLowerCase() === 'pending'){
+        profileApprovedVal = null;
+        queryStmt += ` AND ${tableNames.USERS}.${colNames.profileApproved} IS NULL`;
+        queryStmt2 += ` AND ${tableNames.USERS}.${colNames.profileApproved} IS NULL`;
+      }
+    }
+
+    queryStmt += `
+      ORDER BY ${tableNames.USERS}.${colNames.userId} DESC
+      OFFSET ${offset} ROWS
+      FETCH NEXT ${limit} ROWS ONLY
+    `;
+
+    try {
+      return await Promise.all([
+        db.request()
+        .input(colNames.profileApproved, dbTypes.Bit, profileApprovedVal)
+        .query(queryStmt),
+        db.request()
+        .input(colNames.profileApproved, dbTypes.Bit, profileApprovedVal)
+        .query(queryStmt2)
+      ]);
+    }
+    catch(err){
+      throwError(err.originalError.info.message, 500);
+    }
+  };
 };

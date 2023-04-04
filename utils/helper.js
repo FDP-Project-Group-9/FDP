@@ -1,5 +1,6 @@
 const sql = require('mssql');
 const { validationResult } = require("express-validator");
+const { removeFiles } = require('../config/fileDirectory');
 exports.dbTypes = {
     Int: sql.Int,
     BigInt: sql.BigInt,
@@ -31,6 +32,12 @@ exports.validationErrorHandler = (req, res, next) => {
                 status: 422,
             }
         });
+        if(req.originalUrl.includes("/workshop/upload")){
+            removeFiles(Object.values(req.files)[0]);
+          }
+        if(req.originalUrl.includes("/ums/upload") && req.files) {
+            removeFiles(Object.values(req.files).map(files => files[0]));
+        }
         return res.status(400).json({errors: errs});
     }
     next();
