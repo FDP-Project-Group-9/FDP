@@ -20,7 +20,7 @@ exports.addResourcePerson=(async(req,res,next)=>{
         const id=req.body.id
       try{
         const result=await ResourcePerson.updateResourcePerson(id,requestData);
-        if(result.rowsAffected.length > 0){
+        if(result.rowsAffected[0] > 0){
         return res.status(200).json({msg: "Details of Resource Person Successfully updated"});
         }
         else{
@@ -50,11 +50,11 @@ exports.getSingleResourcePerson=(async(req,res,next)=>{
     const id=req.params.id
     try{
         const result =await ResourcePerson.getResourcePersonbyId(id);
-        const results=result.recordset 
+        const results=result.recordset
         if(result.recordsets.length > 0){
         return res.status(200).json({
         msg: "Resource Person details successfully fetched!",
-        data: results});
+        data: results[0]});
         }
         else {
             throwError("Resource Person Not Found",404);
@@ -80,6 +80,7 @@ exports.deleteSingleResourcePerson=(async(req,res,next)=>{
 
 exports.getResourcePersonDetails=(async(req,res,next)=>{
     const limit=req.query.limit; 
+    const name = req.query.name;
     let requestData=new Object();
 
    
@@ -88,7 +89,8 @@ exports.getResourcePersonDetails=(async(req,res,next)=>{
     specialization_id:req.query.specialization_id,
     country:req.query.country,
     state_name:req.query.state_name,
-    organization_name:req.query.organization_name
+    organization_name:req.query.organization_name,
+    name: name
     }
     try{
         const result= await ResourcePerson.applyFiltersonResourcePerson(requestData,limit);

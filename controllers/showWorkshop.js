@@ -8,6 +8,7 @@ const WorkshopPhotos = require("../models/workshopPhotos");
 const User = require("../models/user");
 
 const { throwError, getAllResults, getFirstResult } = require("../utils/helper");
+const WorkshopResourcePersons = require("../models/workshopResourcePerson");
 
 exports.getWorkshopDetails = async (req, res, next) => {
     const workshopId = req.params['workshop_id'];
@@ -16,6 +17,7 @@ exports.getWorkshopDetails = async (req, res, next) => {
         institute_details: {},
         workshop_details: {},
         co_coordinator_details: {},
+        resource_persons: [],
         files_url: {
             media_photos: [],
             workshop_photos: [],
@@ -64,6 +66,11 @@ exports.getWorkshopDetails = async (req, res, next) => {
         if(workshopDetailsObj){
             responseData['workshop_details'] = workshopDetailsObj;
         }
+
+        //find the resource persons for the workshop
+        result = await WorkshopResourcePersons.findWorkshopResourcePersonsByWorkshopId(workshopId);
+        const workshopResourcePersons = [...result.recordsets[0]];
+        responseData.resource_persons = workshopResourcePersons;
 
         //find the co-coordinator details
         const coCoordinatorId = workshopDetails['co_coordinator_id'];

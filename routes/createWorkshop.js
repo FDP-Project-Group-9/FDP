@@ -6,7 +6,9 @@ const {
     putWorkshopDetails,
     createWorkshop,
     getOTP,
-    verifyOTP
+    verifyOTP,
+    addWorkshopResourcePersons,
+    deleteWorkshopResourcePersons
 } = require('../controllers/createWorkshop');
 
 const { validationErrorHandler } = require("../utils/helper");
@@ -14,8 +16,11 @@ const {
      coordinatorDetailsValidations ,
      insituteDetailsValidations,
      workshopDetailsValidations,
-     workshopIdValidation
+     workshopIdValidation,
+     workshopResourcePersonsValidationRules,
+     deleteWorkshopResourcePersonsValidationRules
 } = require("../middlewares/workshopCreationValidations");
+const { checkIfWorkshopExists } = require('../middlewares/workshop');
 
 const routes = express.Router();
 
@@ -26,6 +31,10 @@ routes.put("/coordinator-details", coordinatorDetailsValidations(), validationEr
 routes.put("/institute-details", insituteDetailsValidations(), validationErrorHandler, putInstituteDetails);
 
 routes.put("/workshop-details", workshopDetailsValidations(), validationErrorHandler, putWorkshopDetails);
+
+routes.put("/resource-persons", workshopResourcePersonsValidationRules(), validationErrorHandler, checkIfWorkshopExists, addWorkshopResourcePersons);
+
+routes.delete("/resource-persons", deleteWorkshopResourcePersonsValidationRules(), validationErrorHandler, checkIfWorkshopExists, deleteWorkshopResourcePersons);
 
 routes.get("/otp", getOTP);
 

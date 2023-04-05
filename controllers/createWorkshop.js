@@ -8,6 +8,8 @@ const Role = require("../models/roles");
 const { throwError } = require("../utils/helper");
 const { roles } = require("../utils/constants");
 const { sendOTP, verifyOTP } = require("../config/otp");
+const WorkshopResourcePersons = require("../models/workshopResourcePerson");
+const ResourcePersonDetails = require("../models/resourcePerson");
 
 exports.createWorkshopDraft = async (req, res, next) => {
     const user = res.locals.user;
@@ -330,6 +332,44 @@ exports.putWorkshopDetails = async (req, res, next) => {
     }
 };
 
+exports.addWorkshopResourcePersons = async (req, res, next) => {
+    const workshopId = req.body.workshop_id;
+    const resourcePersons = req.body.resource_persons;
+
+    const data = {
+        workshopId: workshopId,
+        resourcePersons: resourcePersons
+    };
+
+    try {
+        let personsDetails = await Promise.all(
+            resourcePersons.map(personId => ResourcePersonDetails.getResourcePersonbyId(personId))
+        );
+        const notFound = personsDetails.find(details => details.recordset.length == 0);
+        if(notFound) {
+            throwError("Could not find resource person!", 404);
+        }
+        
+        personsDetails = await Promise.all(
+            resourcePersons.map(personId => WorkshopResourcePersons.findWorkshopResourcePersonByBothId(workshopId, personId))
+        );
+
+        const exists = personsDetails.find(details => details.recordset.length > 0);
+        if(exists) {
+            throwError("Cannot add same speaker twice!", 400);
+        }
+
+        const workshopResourcePersons = new WorkshopResourcePersons(data);
+        await workshopResourcePersons.addWorkshopResourcePersons();
+        res.status(201).json({
+            msg: "Workshop Speakers added successfully!"
+        });
+    }
+    catch(err) {
+        next(err);
+    }
+};
+
 exports.createWorkshop = async (req, res, next) => {
     const workshopId = req.body['workshop_id'];
     const user = res.locals.user;
@@ -460,6 +500,25 @@ exports.approveRejectWorkshop = async (req, res, next) => {
         });
     }
     catch(err){
+        next(err);
+    }
+};
+
+exports.deleteWorkshopResourcePersons = async (req, res, next) => {
+    const workshopId = req.body.workshop_id;
+    const resourcePersonId = req.body.resource_person_id;
+
+    try {
+        const findResourcePerson = await WorkshopResourcePersons.findWorkshopResourcePersonByBothId(workshopId, resourcePersonId);
+        if(findResourcePerson.recordset.length == 0){
+            throwError("Workshop Speaker not found in the workshop!", 404);
+        }
+        await WorkshopResourcePersons.deleteWorkshopResourcePerson(workshopId, resourcePersonId);
+        res.status(201).json({
+            msg: "Workshop Speaker successfully removed from workshop!"
+        });
+    }
+    catch(err) {
         next(err);
     }
 };

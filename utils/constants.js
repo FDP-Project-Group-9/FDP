@@ -35,7 +35,8 @@ exports.tableNames = {
     QUIZ:'quizes',
     WORKSHOP_PHOTOS: 'workshop_photos',
     WORKSHOP_MEDIA_PHOTOS: 'workshop_media_photos',
-    WORKSHOP_OTHER_DOCS: 'workshop_other_docs'
+    WORKSHOP_OTHER_DOCS: 'workshop_other_docs',
+    WORKSHOP_RESOURCE_PERSONS: 'workshop_resource_person'
 };
 
 exports.user = { 
@@ -179,6 +180,27 @@ exports.workshop_other_docs = {
         stmtExpenditureUrl: 'stmt_expenditure_url',
         certificateUrl: 'certificate_url',
         workshopId: 'workshop_id'
+    }
+};
+
+exports.resource_persons = {
+    colNames: {
+        id: 'id',
+        personName: 'person_name',
+        emailId: 'email_id',
+        mobileNo: 'mobile_no',
+        designation: 'designation',
+        specializationId: 'specialization_id',
+        country: 'country',
+        stateName: 'state_name',
+        organizationName: 'organization_name'
+    }
+};
+
+exports.workshop_resource_persons = {
+    colNames: {
+        workshopId: 'workshop_id',
+        resourcePersonId: 'resource_person_id'
     }
 };
 

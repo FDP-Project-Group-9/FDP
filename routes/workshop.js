@@ -12,7 +12,7 @@ const { addWorkshopSpecializationValidations } = require("../middlewares/worksho
 const { getWorkshopDetails, getAllWorkshops, getUserWorkshops } = require("../controllers/showWorkshop")
 const { validationErrorHandler } = require('../utils/helper');
 const { approveRejectWorkshop } = require('../controllers/createWorkshop');
-const { workshopIdValidation } = require('../middlewares/workshopCreationValidations');
+const { workshopApprovalRejectionValidation } = require('../middlewares/workshopCreationValidations');
 const { checkIfWorkshopExists } = require('../middlewares/workshop');
 
 const routes = express.Router();
@@ -34,7 +34,7 @@ routes.post("/specialization", verifyCoordinatorRole, addWorkshopSpecializationV
 routes.get("/specializations", getWorkshopSpecializations);
 
 // approve workshop
-routes.put("/approve-application", verifyAdministratorRole, workshopIdValidation(), validationErrorHandler, approveRejectWorkshop);
+routes.put("/approve-application", verifyAdministratorRole, workshopApprovalRejectionValidation(), validationErrorHandler, approveRejectWorkshop);
 
 //get workshop details
 routes.get("/user-workshops", verifyCoordinatorRole, getUserWorkshops);

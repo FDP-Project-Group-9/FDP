@@ -190,9 +190,42 @@ exports.workshopIdValidation = () => {
         body("workshop_id")
             .exists()
             .withMessage("Workshop id is required!")
+    ];
+};
+
+exports.workshopApprovalRejectionValidation = () => {
+    return [
+        body("workshop_id")
+            .exists()
+            .withMessage("Workshop id is required!")
         ,
         body("approve")
             .exists()
             .withMessage("Approval value is required!")
+    ];
+};
+
+exports.workshopResourcePersonsValidationRules = () => {
+    return [
+        body('workshop_id')
+            .exists()
+            .withMessage("Workshop id is required!"),
+        body('resource_persons')
+            .exists()
+            .withMessage("Resource persons id's are required!")
+            .bail()
+            .isArray({min: 1})
+            .withMessage("Atleast one Workshop Speaker is required!")
+    ];
+};
+
+exports.deleteWorkshopResourcePersonsValidationRules = () => {
+    return [
+        body('workshop_id')
+            .exists()
+            .withMessage("Workshop id is required!"),
+        body('resource_person_id')
+            .exists()
+            .withMessage("Resource persons id is required!")
     ];
 };

@@ -119,6 +119,8 @@ module.exports = class ResourcePersonDetails {
         designation,
         country,
         state_name,
+        specialization_id,
+        organization_name,
         ${tableNames.WORKSHOP_SPECIALIZATION}.specialization as area_specialization
         FROM ${tableNames.RESOURCE_PERSON}
         INNER JOIN ${tableNames.WORKSHOP_SPECIALIZATION}
@@ -151,8 +153,8 @@ module.exports = class ResourcePersonDetails {
     
     static async applyFiltersonResourcePerson(data,limit){
       const db = getDB();
-      console.log(data)
       let  queryStmt = `SELECT  
+      ${tableNames.RESOURCE_PERSON}.id,
       person_name,
       email_id,
       mobile_no,
@@ -178,6 +180,10 @@ module.exports = class ResourcePersonDetails {
       }
       if(data.organization_name!=undefined){
         queryStmt+=` AND organization_name=@organization_name`;
+      }
+
+      if(data.name?.length > 0) {
+        queryStmt += ` AND UPPER(person_name) LIKE UPPER('%${data.name}%')`;
       }
       try {
         return await db.request()
