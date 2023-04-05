@@ -70,20 +70,17 @@ module.exports = class WorkshopPhotos {
         };
     }
 
-    static async findFileById(fileId, workshopId) {
+    static async findFileById(fileId) {
         const db = getDB();
         const queryStmt = `SELECT * FROM
             ${tableNames.WORKSHOP_PHOTOS}
             WHERE
             ${colNames.id} = ${'@' + colNames.id}
-            AND
-            ${colNames.workshopId} = ${'@' + colNames.workshopId}
         `;
 
         try {
             return await db.request()
             .input(colNames.id, dbTypes.Int, fileId)
-            .input(colNames.workshopId, dbTypes.Int, workshopId)
             .query(queryStmt);
         }
         catch(err) {

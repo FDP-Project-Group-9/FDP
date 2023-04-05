@@ -6,20 +6,24 @@ exports.roles = {
 
 exports.fileUploadNames = {
     USER: {
-
+        REGISTRATION_DOC: 'registration_doc',
+        COORDINATOR_MANDATE_FORM: 'coordinator_mandate_form',
+        COORDINATOR_PHOTO: 'coordinator_photo',
+        COORDINATOR_SIGNATURE: 'coordinator_signature',
+        INSTITUTE_LOGO: 'institute_logo'
     },
     WORKSHOP: {
-        IMAGES: "workshopImages",
-        MEDIA_IMAGES: "workshopMediaImages",
-        REPORT: "workshopReport",
-        STMT_OF_EXPENDITURE: "workshopStmtOfExpenditure"
+        IMAGES: "workshop_images",
+        MEDIA_IMAGES: "workshop_media_images",
+        REPORT: "workshop_report",
+        STMT_OF_EXPENDITURE: "workshop_stmt_of_expenditure"
     }
 };
 
 exports.tableNames = {
     USERS: 'users',
     ROLES: 'roles',
-    USERDOCS: 'user_docs',
+    COORDINATOR_DOCS: 'coordinator_docs',
     WORKSHOP: 'workshops',
     WORKSHOP_SPECIALIZATION: 'workshop_specializations',
     COORDINATOR_DETAILS: 'coordinator_details',
@@ -54,7 +58,11 @@ exports.user = {
 exports.user_docs = {
     colNames: {
         id: 'id',
-        filePath: 'file_path',
+        registrationDocUrl: 'registration_doc_url',
+        coordinatorMandateUrl: 'coordinator_mandate_form_url',
+        coordinatorPhotoUrl: 'coordinator_photo_url',
+        coordinatorSignatureUrl: 'coordinator_signature_url',
+        instituteLogoUrl: 'institute_logo_url',
         userId: 'user_id'
     }
 };

@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const WorkshopMediaPhotos = require('../models/workshopMediaPhotos');
 const WorkshopPhotos = require('../models/workshopPhotos');
 const WorkshopOtherDocs = require('../models/workshopOtherDocs');
@@ -290,6 +292,192 @@ exports.deleteWorkshopStmtOfExpenditure = async (req, res, next) => {
         res.status(200).json({
             msg: "File deleted successfully!"
         });
+    }
+    catch(err) {
+        next(err);
+    }
+};
+
+exports.getWorkshopMediaImage = async (req, res, next) => {
+    const fileId = req.params.fileId;
+
+    try {
+        const result = await WorkshopMediaPhotos.findWorkshopMediaImageById(fileId);
+        if(result.recordset.length == 0) {
+            throwError("Could not find the file", 404);
+        }
+        const mediaPhotoUrl = result.recordset[0].media_photo_url;
+        const stream = fs.createReadStream(mediaPhotoUrl);
+        stream.on('error', () => {
+           return res.status(404).json({
+            errors: [
+                {
+                    msg: "Could not find the file on server!",
+                    status: 404
+                }
+            ]
+           }); 
+        });
+        const fileType = mediaPhotoUrl.split('.').slice(-1);
+        let contentType = 'application/pdf';
+
+        if(fileType?.length > 0 && fileType[0] === 'png')
+            contentType = 'image/png';
+        else if(fileType?.length > 0 && fileType[0] === 'jpeg') 
+            contentType = 'image/jpeg';
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', 'attachment');
+        stream.pipe(res);
+    }
+    catch(err) {
+        console.log(err);
+        next(err);
+    }
+};
+
+exports.getWorkshopImage = async (req, res, next) => {
+    const fileId = req.params.fileId;
+
+    try {
+        const result = await WorkshopPhotos.findFileById(fileId);
+        if(result.recordset.length == 0) {
+            throwError("Could not find the file", 404);
+        }
+        const workshopPhotoUrl = result.recordset[0].photo_url;
+        const stream = fs.createReadStream(workshopPhotoUrl);
+        stream.on('error', () => {
+           return res.status(404).json({
+            errors: [
+                {
+                    msg: "Could not find the file on server!",
+                    status: 404
+                }
+            ]
+           }); 
+        });
+        const fileType = workshopPhotoUrl.split('.').slice(-1);
+        let contentType = 'application/pdf';
+
+        if(fileType?.length > 0 && fileType[0] === 'png')
+            contentType = 'image/png';
+        else if(fileType?.length > 0 && fileType[0] === 'jpeg') 
+            contentType = 'image/jpeg';
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', 'attachment');
+        stream.pipe(res);
+    }
+    catch(err) {
+        next(err);
+    }
+};
+
+exports.getWorkshopReport = async (req, res, next) => {
+    const fileId = req.params.fileId;
+
+    try {
+        const result = await WorkshopOtherDocs.findDocumentsByFileId(fileId);
+        if(result.recordset.length == 0) {
+            throwError("Could not find the file", 404);
+        }
+        const workshopReportUrl = result.recordset[0].report_url;
+        const stream = fs.createReadStream(workshopReportUrl);
+        stream.on('error', () => {
+           return res.status(404).json({
+            errors: [
+                {
+                    msg: "Could not find the file on server!",
+                    status: 404
+                }
+            ]
+           }); 
+        });
+        const fileType = workshopReportUrl.split('.').slice(-1);
+        let contentType = 'application/pdf';
+
+        if(fileType?.length > 0 && fileType[0] === 'png')
+            contentType = 'image/png';
+        else if(fileType?.length > 0 && fileType[0] === 'jpeg') 
+            contentType = 'image/jpeg';
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', 'attachment');
+        stream.pipe(res);
+    }
+    catch(err) {
+        next(err);
+    }
+};
+
+exports.getWorkshopStmtOfExpenditure = async (req, res, next) => {
+    const fileId = req.params.fileId;
+
+    try {
+        const result = await WorkshopOtherDocs.findDocumentsByFileId(fileId);
+        if(result.recordset.length == 0) {
+            throwError("Could not find the file", 404);
+        }
+        const workshopStmtOfExpenditureUrl = result.recordset[0].stmt_expenditure_url;
+        const stream = fs.createReadStream(workshopStmtOfExpenditureUrl);
+        stream.on('error', () => {
+           return res.status(404).json({
+            errors: [
+                {
+                    msg: "Could not find the file on server!",
+                    status: 404
+                }
+            ]
+           }); 
+        });
+        const fileType = workshopStmtOfExpenditureUrl.split('.').slice(-1);
+        let contentType = 'application/pdf';
+
+        if(fileType?.length > 0 && fileType[0] === 'png')
+            contentType = 'image/png';
+        else if(fileType?.length > 0 && fileType[0] === 'jpeg') 
+            contentType = 'image/jpeg';
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', 'attachment');
+        stream.pipe(res);
+    }
+    catch(err) {
+        next(err);
+    }
+};
+
+exports.getWorkshopCertificate = async (req, res, next) => {
+    const fileId = req.params.fileId;
+
+    try {
+        const result = await WorkshopOtherDocs.findDocumentsByFileId(fileId);
+        if(result.recordset.length == 0) {
+            throwError("Could not find the file", 404);
+        }
+        const workshopCertificateUrl = result.recordset[0].certificate_url;
+        const stream = fs.createReadStream(workshopCertificateUrl);
+        stream.on('error', () => {
+           return res.status(404).json({
+            errors: [
+                {
+                    msg: "Could not find the file on server!",
+                    status: 404
+                }
+            ]
+           }); 
+        });
+        const fileType = workshopCertificateUrl.split('.').slice(-1);
+        let contentType = 'application/pdf';
+
+        if(fileType?.length > 0 && fileType[0] === 'png')
+            contentType = 'image/png';
+        else if(fileType?.length > 0 && fileType[0] === 'jpeg') 
+            contentType = 'image/jpeg';
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', 'attachment');
+        stream.pipe(res);
     }
     catch(err) {
         next(err);

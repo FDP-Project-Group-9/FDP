@@ -65,6 +65,10 @@ app.use((error, req, res, next) => {
     if(req.originalUrl.includes("/workshop/upload")){
       removeFiles(Object.values(req.files)[0]);
     }
+
+    if(req.originalUrl.includes("/ums/upload") && req.files) {
+      removeFiles(Object.values(req.files).map(files => files[0]));
+    }
   }
   next();
 });

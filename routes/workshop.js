@@ -3,6 +3,7 @@ const express = require('express');
 const createWorkshopRoutes = require('./createWorkshop');
 const uploadWorkshopFilesRoutes = require('./workshopUploads');
 const deleteWorkshopFilesRoutes = require('./workshopDeleteFile');
+const getWorkshopFilesRoutes = require('./getWorkshopFiles');
 const quizRoutes=require('./quiz');
 
 const { addWorkshopSpecialization, getWorkshopSpecializations } = require('../controllers/workshopSpecialization');
@@ -10,7 +11,7 @@ const { verifyCoordinatorRole, verifyAdministratorRole } = require('../middlewar
 const { addWorkshopSpecializationValidations } = require("../middlewares/workshopSpecializationValidations");
 const { getWorkshopDetails, getAllWorkshops, getUserWorkshops } = require("../controllers/showWorkshop")
 const { validationErrorHandler } = require('../utils/helper');
-const { approveWorkshop } = require('../controllers/createWorkshop');
+const { approveRejectWorkshop } = require('../controllers/createWorkshop');
 const { workshopIdValidation } = require('../middlewares/workshopCreationValidations');
 const { checkIfWorkshopExists } = require('../middlewares/workshop');
 
@@ -25,12 +26,15 @@ routes.use("/upload", verifyCoordinatorRole, uploadWorkshopFilesRoutes);
 //routes for deleting workshop files
 routes.use("/delete", verifyCoordinatorRole, checkIfWorkshopExists, deleteWorkshopFilesRoutes);
 
+//routes for viewing workshop files
+routes.use("/view", getWorkshopFilesRoutes);
+
 // workshop specializations routes
 routes.post("/specialization", verifyCoordinatorRole, addWorkshopSpecializationValidations(), validationErrorHandler, addWorkshopSpecialization);
-routes.get("/specializations", verifyCoordinatorRole, getWorkshopSpecializations);
+routes.get("/specializations", getWorkshopSpecializations);
 
 // approve workshop
-routes.put("/approve", verifyAdministratorRole, workshopIdValidation(), validationErrorHandler, approveWorkshop);
+routes.put("/approve-application", verifyAdministratorRole, workshopIdValidation(), validationErrorHandler, approveRejectWorkshop);
 
 //get workshop details
 routes.get("/user-workshops", verifyCoordinatorRole, getUserWorkshops);

@@ -1,5 +1,67 @@
 const fs = require('fs');
-const { throwError } = require('../utils/helper');
+
+const createRegistrationDocDirectory = () => {
+  fs.stat("./files/user-docs/registration-docs", err => {
+      if(err){
+        fs.mkdir("./files/user-docs/registration-docs", error => {
+          if(error){
+            console.log('Error occured while creating directory for registration docs...');
+            console.log(error);
+          }
+        });
+      }
+  });
+};
+const createCoordinaturePhotoDirectory = () => {
+  fs.stat("./files/user-docs/coordinator-photo", err => {
+      if(err){
+        fs.mkdir("./files/user-docs/coordinator-photo", error => {
+          if(error){
+            console.log('Error occured while creating directory for coordinator photo...');
+            console.log(error);
+          }
+        });
+      }
+  });
+};
+const createCoordinatorMandateFormDirectory = () => {
+  fs.stat("./files/user-docs/coordinator-mandate-form", err => {
+      if(err){
+        fs.mkdir("./files/user-docs/coordinator-mandate-form", error => {
+          if(error){
+            console.log('Error occured while creating directory for coordinator mandate form...');
+            console.log(error);
+          }
+        });
+      }
+  });
+};
+
+const createCoordinatorSignatureDirectory = () => {
+  fs.stat("./files/user-docs/coordinator-signature", err => {
+      if(err){
+        fs.mkdir("./files/user-docs/coordinator-signature", error => {
+          if(error){
+            console.log('Error occured while creating directory for coordinator signature...');
+            console.log(error);
+          }
+        });
+      }
+  });
+};
+
+const createInstituteLogoDirectory = () => {
+  fs.stat("./files/user-docs/institute-logo", err => {
+      if(err){
+        fs.mkdir("./files/user-docs/institute-logo", error => {
+          if(error){
+            console.log('Error occured while creating directory for institute logo...');
+            console.log(error);
+          }
+        });
+      }
+  });
+};
 
 const createUserDocsDirectory = () => {
     fs.stat("./files/user-docs", err => {
@@ -11,6 +73,11 @@ const createUserDocsDirectory = () => {
             }
           });
         }
+        createRegistrationDocDirectory();
+        createCoordinatorMandateFormDirectory();
+        createCoordinaturePhotoDirectory();
+        createCoordinatorSignatureDirectory();
+        createInstituteLogoDirectory();
       });
 };
 

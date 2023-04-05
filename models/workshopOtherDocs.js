@@ -174,6 +174,24 @@ module.exports = class WorkshopOtherDocs {
         }
     };
 
+    static async findDocumentsByFileId(fileId) {
+        const db = getDB();
+        const queryStmt = `SELECT * FROM 
+            ${tableNames.WORKSHOP_OTHER_DOCS}
+            WHERE
+            ${colNames.id} = ${'@' + colNames.id}
+        `;
+
+        try{
+            return await db.request()
+            .input(colNames.id, dbTypes.Int, fileId)
+            .query(queryStmt);
+        }
+        catch(err) {
+            throwError(err.originalError.info.message, 500);
+        }
+    };
+
     static async updateOtherDocs (reportUrl, stmtOfExpenditureUrl, certificateUrl, workshopId) {
         const db = getDB();
         const queryStmt = `UPDATE ${tableNames.WORKSHOP_OTHER_DOCS}

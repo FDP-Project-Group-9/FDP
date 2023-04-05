@@ -2,6 +2,7 @@ const { body } = require("express-validator");
 
 const User = require("../models/user");
 const Roles = require("../models/roles");
+const { fileUploadNames } = require("../utils/constants");
 
 exports.signupValidationRules = () => {
     return [
@@ -226,14 +227,41 @@ exports.updateUserDetailsRules = () => {
     ];
 };
 
-exports.uploadFilesValidationRules = () => {
+exports.uploadRegistrationDocValidationRules = () => {
     return [
         body("email_id")
             .exists()
             .withMessage("Email is required!")
             .bail()
             .isEmail()
-            .withMessage("Invalid Email")
+            .withMessage("Invalid Email"),
+        body(fileUploadNames.USER.REGISTRATION_DOC)
+            .custom((_, { req }) => {
+                if(!req.files[fileUploadNames.USER.REGISTRATION_DOC] || req.files[fileUploadNames.USER.REGISTRATION_DOC]?.length == 0)
+                    return Promise.reject({
+                        errorMsg: "Registration Doc is required!",
+                        status: 422
+                    });
+                return Promise.resolve();
+            })
     ];
 };
 
+
+exports.addMandateDocsValidationRules = () => {
+    return [
+        body("user_id")
+            .exists()
+            .withMessage("User id is required!")
+    ]
+};
+
+exports.approveRejectCoordinatorRegistrationValidationRules = () => {
+    return [
+        body('user_id')
+            .exists()
+            .withMessage("User id is required!"),
+        body('approve')
+            .exists('Approval value is required!')
+    ];
+};

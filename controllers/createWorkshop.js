@@ -445,16 +445,18 @@ exports.verifyOTP = async (req, res, next) => {
     }
 };
 
-exports.approveWorkshop = async (req, res, next) => {
+exports.approveRejectWorkshop = async (req, res, next) => {
     const workshopId = req.body['workshop_id'];
-    
+    const approve = req.body.approve;
+
     try{
-        const result = await WorkshopDetails.approveWorkshop(workshopId);
+        const result = await WorkshopDetails.approveWorkshop(workshopId, approve);
         if(result.rowsAffected[0] == 0){
             throwError("Workshop not found!", 404);
         }
+        const msg = approve ? "Workshop Approved Successfully!" : "Workshop Rejected Successfully!"
         res.status(200).json({
-            msg: "Workshop approved successfully!"
+            msg: msg
         });
     }
     catch(err){
