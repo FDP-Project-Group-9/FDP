@@ -195,7 +195,7 @@ exports.getRegistrationDoc = async (req, res, next) => {
 
         if(fileType?.length > 0 && fileType[0] === 'png')
             contentType = 'image/png';
-        else if(fileType?.length > 0 && fileType[0] === 'jpeg') 
+        else if(fileType?.length > 0 && (fileType[0] === 'jpg' || fileType[0] === 'jpeg')) 
             contentType = 'image/jpeg';
 
         res.setHeader('Content-Type', contentType);

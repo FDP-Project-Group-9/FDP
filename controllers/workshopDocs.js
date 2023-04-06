@@ -323,7 +323,7 @@ exports.getWorkshopMediaImage = async (req, res, next) => {
 
         if(fileType?.length > 0 && fileType[0] === 'png')
             contentType = 'image/png';
-        else if(fileType?.length > 0 && fileType[0] === 'jpeg') 
+        else if(fileType?.length > 0 && (fileType[0] === 'jpg' || fileType[0] === 'jpeg')) 
             contentType = 'image/jpeg';
 
         res.setHeader('Content-Type', contentType);
@@ -361,7 +361,7 @@ exports.getWorkshopImage = async (req, res, next) => {
 
         if(fileType?.length > 0 && fileType[0] === 'png')
             contentType = 'image/png';
-        else if(fileType?.length > 0 && fileType[0] === 'jpeg') 
+        else if(fileType?.length > 0 && (fileType[0] === 'jpg' || fileType[0] === 'jpeg')) 
             contentType = 'image/jpeg';
 
         res.setHeader('Content-Type', contentType);
@@ -398,7 +398,7 @@ exports.getWorkshopReport = async (req, res, next) => {
 
         if(fileType?.length > 0 && fileType[0] === 'png')
             contentType = 'image/png';
-        else if(fileType?.length > 0 && fileType[0] === 'jpeg') 
+        else if(fileType?.length > 0 && (fileType[0] === 'jpg' || fileType[0] === 'jpeg')) 
             contentType = 'image/jpeg';
 
         res.setHeader('Content-Type', contentType);
@@ -435,7 +435,7 @@ exports.getWorkshopStmtOfExpenditure = async (req, res, next) => {
 
         if(fileType?.length > 0 && fileType[0] === 'png')
             contentType = 'image/png';
-        else if(fileType?.length > 0 && fileType[0] === 'jpeg') 
+        else if(fileType?.length > 0 && (fileType[0] === 'jpg' || fileType[0] === 'jpeg')) 
             contentType = 'image/jpeg';
 
         res.setHeader('Content-Type', contentType);
@@ -472,7 +472,7 @@ exports.getWorkshopCertificate = async (req, res, next) => {
 
         if(fileType?.length > 0 && fileType[0] === 'png')
             contentType = 'image/png';
-        else if(fileType?.length > 0 && fileType[0] === 'jpeg') 
+        else if(fileType?.length > 0 && (fileType[0] === 'jpg' || fileType[0] === 'jpeg')) 
             contentType = 'image/jpeg';
 
         res.setHeader('Content-Type', contentType);

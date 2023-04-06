@@ -21,7 +21,12 @@ exports.getWorkshopDetails = async (req, res, next) => {
         files_url: {
             media_photos: [],
             workshop_photos: [],
-            other_docs_id: null
+            other_docs: {
+                id: null,
+                report_exists: false, 
+                stmt_expenditure_exists: false,
+                certificate_exists: false
+            }
         }
     };
     let workshopDetails;
@@ -93,7 +98,14 @@ exports.getWorkshopDetails = async (req, res, next) => {
         const workshopOtherDocs = await WorkshopOtherDocs.findDocumentsByWorkshopId(workshopId);
         result = getFirstResult(workshopOtherDocs);
         
-        responseData['files_url']['other_docs_id'] = result?.id ?? null;
+        if(result){
+            responseData['files_url']['other_docs'] = {
+                id: result.id,
+                report_exists: !!result.report_url,
+                stmt_expenditure_exists: !!result.stmt_expenditure_url,
+                certificate_exists: !!result.certificate_url
+            }
+        }
 
         res.status(200).json({
             msg: "Workshop details successfully fetched!",
