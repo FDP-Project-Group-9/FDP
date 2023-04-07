@@ -39,6 +39,7 @@ module.exports = class CoordinatorDocs {
     static async findCoordinatorDocs(userId) {
         const db = getDB(); 
         const queryStmt = `SELECT 
+            ${colNames.id},
             ${colNames.coordinatorMandateUrl},
             ${colNames.coordinatorPhotoUrl},
             ${colNames.registrationDocUrl},
@@ -72,7 +73,6 @@ module.exports = class CoordinatorDocs {
             WHERE
             ${colNames.userId} = ${'@' + colNames.userId}
         `; 
-
         try {
             return await db.request()
             .input(colNames.coordinatorMandateUrl, dbTypes.VarChar(255), dataObj[colNames.coordinatorMandateUrl] || null)

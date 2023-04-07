@@ -81,7 +81,7 @@ exports.updateMandateDocs = async (req, res, next) => {
         if(existingCoordinatorDocs.recordset.length == 0){
             throwError("Registration Document not found! Registration Document is required", 404);
         }
-        let data = {...existingCoordinatorDocs.recordset[0]};
+        let data = {...existingCoordinatorDocs.recordset[0], user_id: userId};
 
         if(coordinatorMandateFormFile?.path) {
             if(data[colNames.coordinatorMandateUrl]) {
@@ -127,7 +127,7 @@ exports.deleteMandateDocs = async (req, res, next) => {
 
     try {
         const existingCoordinatorDocs = await CoordinatorDocs.findCoordinatorDocs(userId);
-        const data = {...existingCoordinatorDocs.recordset[0]};
+        const data = {...existingCoordinatorDocs.recordset[0], user_id: userId};
         if( deleteCoordinatorMandateForm ){
             if(!data[colNames.coordinatorMandateUrl])
                 throwError("Coordinator Mandate form not found!", 404);
@@ -191,6 +191,171 @@ exports.getRegistrationDoc = async (req, res, next) => {
            }); 
         });
         const fileType = registrationDocUrl.split('.').slice(-1);
+        let contentType = 'application/pdf';
+
+        if(fileType?.length > 0 && fileType[0] === 'png')
+            contentType = 'image/png';
+        else if(fileType?.length > 0 && (fileType[0] === 'jpg' || fileType[0] === 'jpeg')) 
+            contentType = 'image/jpeg';
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', 'attachment');
+        stream.pipe(res);
+    }
+    catch(err){
+        next(err);
+    }
+};
+
+exports.getCoordinatorMandateForm = async (req, res, next) => {
+    const userId = res.locals.user.user_id;
+
+    try {
+        const coordinatorDocs = await CoordinatorDocs.findCoordinatorDocs(userId);
+        if(coordinatorDocs.recordset.length == 0){
+            throwError("Document not found!", 404);
+        }
+        const mandateFormUrl = coordinatorDocs.recordset[0][colNames.coordinatorMandateUrl];
+        if(!mandateFormUrl) {
+            throwError("Mandate form not found!", 404);
+        }
+
+        const stream = fs.createReadStream(mandateFormUrl);
+        stream.on('error', () => {
+           return res.status(404).json({
+            errors: [
+                {
+                    msg: "Could not find the file on server!",
+                    status: 404
+                }
+            ]
+           }); 
+        });
+        const fileType = mandateFormUrl.split('.').slice(-1);
+        let contentType = 'application/pdf';
+
+        if(fileType?.length > 0 && fileType[0] === 'png')
+            contentType = 'image/png';
+        else if(fileType?.length > 0 && (fileType[0] === 'jpg' || fileType[0] === 'jpeg')) 
+            contentType = 'image/jpeg';
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', 'attachment');
+        stream.pipe(res);
+    }
+    catch(err){
+        console.log(err);
+        next(err);
+    }
+};
+
+exports.getCoordinatorPhoto = async (req, res, next) => {
+    const userId = res.locals.user.user_id;
+
+    try {
+        const coordinatorDocs = await CoordinatorDocs.findCoordinatorDocs(userId);
+        if(coordinatorDocs.recordset.length == 0){
+            throwError("Document not found!", 404);
+        }
+        const coordinatorPhotoUrl = coordinatorDocs.recordset[0][colNames.coordinatorPhotoUrl];
+        if(!coordinatorPhotoUrl) {
+            throwError("Coordinator Photo not found!", 404);
+        }
+
+        const stream = fs.createReadStream(coordinatorPhotoUrl);
+        stream.on('error', () => {
+           return res.status(404).json({
+            errors: [
+                {
+                    msg: "Could not find the file on server!",
+                    status: 404
+                }
+            ]
+           }); 
+        });
+        const fileType = coordinatorPhotoUrl.split('.').slice(-1);
+        let contentType = 'application/pdf';
+
+        if(fileType?.length > 0 && fileType[0] === 'png')
+            contentType = 'image/png';
+        else if(fileType?.length > 0 && (fileType[0] === 'jpg' || fileType[0] === 'jpeg')) 
+            contentType = 'image/jpeg';
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', 'attachment');
+        stream.pipe(res);
+    }
+    catch(err){
+        next(err);
+    }
+};
+
+exports.getCoordinatorSignature = async (req, res, next) => {
+    const userId = res.locals.user.user_id;
+
+    try {
+        const coordinatorDocs = await CoordinatorDocs.findCoordinatorDocs(userId);
+        if(coordinatorDocs.recordset.length == 0){
+            throwError("Document not found!", 404);
+        }
+        const coordinatorSignatureUrl = coordinatorDocs.recordset[0][colNames.coordinatorSignatureUrl];
+        if(!coordinatorSignatureUrl) {
+            throwError("Signature file not found!", 404);
+        }
+
+        const stream = fs.createReadStream(coordinatorSignatureUrl);
+        stream.on('error', () => {
+           return res.status(404).json({
+            errors: [
+                {
+                    msg: "Could not find the file on server!",
+                    status: 404
+                }
+            ]
+           }); 
+        });
+        const fileType = coordinatorSignatureUrl.split('.').slice(-1);
+        let contentType = 'application/pdf';
+
+        if(fileType?.length > 0 && fileType[0] === 'png')
+            contentType = 'image/png';
+        else if(fileType?.length > 0 && (fileType[0] === 'jpg' || fileType[0] === 'jpeg')) 
+            contentType = 'image/jpeg';
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', 'attachment');
+        stream.pipe(res);
+    }
+    catch(err){
+        next(err);
+    }
+};
+
+exports.getInstituteLogo = async (req, res, next) => {
+    const userId = res.locals.user.user_id;
+
+    try {
+        const coordinatorDocs = await CoordinatorDocs.findCoordinatorDocs(userId);
+        if(coordinatorDocs.recordset.length == 0){
+            throwError("Document not found!", 404);
+        }
+        const instituteLogo = coordinatorDocs.recordset[0][colNames.instituteLogoUrl];
+        if(!instituteLogo) {
+            throwError("Institute logo not found!", 404);
+        }
+
+        const stream = fs.createReadStream(instituteLogo);
+        stream.on('error', () => {
+           return res.status(404).json({
+            errors: [
+                {
+                    msg: "Could not find the file on server!",
+                    status: 404
+                }
+            ]
+           }); 
+        });
+        const fileType = instituteLogo.split('.').slice(-1);
         let contentType = 'application/pdf';
 
         if(fileType?.length > 0 && fileType[0] === 'png')
