@@ -215,4 +215,75 @@ module.exports = class WorkshopOtherDocs {
             throwError(err.originalError.info.message, 500);
         }
     };
+
+    static async addWorkshopBrochure (fileUrl, workshopId) {
+        const db = getDB();
+        const queryStmt = `
+            INSERT INTO ${tableNames.WORKSHOP_OTHER_DOCS}
+            (
+                ${colNames.brochureUrl},
+                ${colNames.workshopId}
+            )
+            VALUES 
+            (
+                ${'@' + colNames.brochureUrl},
+                ${'@' + colNames.workshopId}
+            )
+        `;
+
+        try {
+            return await db.request()
+            .input(colNames.brochureUrl, dbTypes.VarChar(255), fileUrl)
+            .input(colNames.workshopId, dbTypes.Int, workshopId) 
+            .query(queryStmt);
+        }
+        catch(err) {
+            throwError(err.originalError.info.message, 500);
+        }
+    };
+
+    static async updateWorkshopBrochure (fileUrl, workshopId) {
+        const db = getDB();
+        const queryStmt = `
+            UPDATE ${tableNames.WORKSHOP_OTHER_DOCS}
+            SET 
+            ${colNames.brochureUrl} = ${'@' + colNames.brochureUrl}
+            WHERE
+            ${colNames.workshopId} = ${'@' + colNames.workshopId}
+        `;
+
+        try {
+            return await db.request()
+            .input(colNames.brochureUrl, dbTypes.VarChar(255), fileUrl)
+            .input(colNames.workshopId, dbTypes.Int, workshopId) 
+            .query(queryStmt);
+        }
+        catch(err) {
+            throwError(err.originalError.info.message, 500);
+        }
+    };
+
+    static async deleteWorkshopBrochure(fileId, workshopId) {
+        const db = getDB();
+        const queryStmt = `UPDATE
+            ${tableNames.WORKSHOP_OTHER_DOCS}
+            SET
+            ${colNames.brochureUrl} = ${'@' + colNames.brochureUrl}
+            WHERE
+            ${colNames.id} = ${'@' + colNames.id}
+            AND
+            ${colNames.workshopId} = ${'@' + colNames.workshopId}
+        `;
+
+        try {
+            return await db.request()
+            .input(colNames.brochureUrl, dbTypes.VarChar(255), null)
+            .input(colNames.id, dbTypes.Int, fileId)
+            .input(colNames.workshopId, dbTypes.Int, workshopId)
+            .query(queryStmt);
+        }
+        catch(err) {
+            throwError(err.originalError.info.message, 500);
+        }
+    };
 };

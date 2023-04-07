@@ -25,7 +25,8 @@ exports.getWorkshopDetails = async (req, res, next) => {
                 id: null,
                 report_exists: false, 
                 stmt_expenditure_exists: false,
-                certificate_exists: false
+                certificate_exists: false,
+                brochure_exists: false
             }
         }
     };
@@ -103,7 +104,8 @@ exports.getWorkshopDetails = async (req, res, next) => {
                 id: result.id,
                 report_exists: !!result.report_url,
                 stmt_expenditure_exists: !!result.stmt_expenditure_url,
-                certificate_exists: !!result.certificate_url
+                certificate_exists: !!result.certificate_url,
+                brochure_exists: !!result.brochure_url
             }
         }
 

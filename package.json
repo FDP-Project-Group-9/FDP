@@ -23,6 +23,7 @@
     "nodemailer": "^6.9.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
+    "pdfkit": "^0.13.0",
     "tedious": "^15.1.2",
     "twilio": "^4.7.2",
     "unique-filename": "^3.0.0",

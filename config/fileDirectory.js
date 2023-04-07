@@ -146,6 +146,19 @@ const createWorkshopStmtOfExpenditure = () => {
     });
 };
 
+const createWorkshopBrochure = () => {
+    fs.stat("./files/workshop-docs/brochure", err => {
+        if(err){
+          fs.mkdir("./files/workshop-docs/brochure", error => {
+            if(error){
+              console.log('Error occured while creating directory for workshop brochure...');
+              console.log(error);
+            }
+          });
+        }
+    });
+};
+
 const createWorkshopDocsDirectory = () => {
     fs.stat("./files/workshop-docs", err => {
         if(err){
@@ -161,6 +174,7 @@ const createWorkshopDocsDirectory = () => {
         createWorkshopCertificateDirectory();
         createWorkshopReportsDirectory();
         createWorkshopStmtOfExpenditure();
+        createWorkshopBrochure();
       });
 };
 
@@ -191,5 +205,5 @@ exports.removeFiles = (files) => {
 };
 
 exports.removeFileByPath = (filePath) => {
-  fs.rmSync(filePath);
+  fs.rmSync(filePath, { force: true});
 };

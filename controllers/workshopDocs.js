@@ -298,6 +298,28 @@ exports.deleteWorkshopStmtOfExpenditure = async (req, res, next) => {
     }
 };
 
+exports.deleteWorkshopBrochure = async (req, res, next) => {
+    const fileId = req.body['file_id'];
+    const workshopId = req.body['workshop_id'];
+
+    try {
+        const fileDetails = await WorkshopOtherDocs.findDocumentsByWorkshopId(workshopId);
+        if(fileDetails.recordset.length == 0 || !fileDetails.recordset[0][workshop_other_docs.colNames.brochureUrl]){
+            throwError("File not found!", 404);
+        }
+
+        removeFileByPath(fileDetails.recordset[0][workshop_other_docs.colNames.brochureUrl]);
+
+        await WorkshopOtherDocs.deleteWorkshopBrochure(fileId, workshopId);
+        res.status(200).json({
+            msg: "File deleted successfully!"
+        });
+    }
+    catch(err) {
+        next(err);
+    }
+};
+
 exports.getWorkshopMediaImage = async (req, res, next) => {
     const fileId = req.params.fileId;
 
@@ -307,6 +329,9 @@ exports.getWorkshopMediaImage = async (req, res, next) => {
             throwError("Could not find the file", 404);
         }
         const mediaPhotoUrl = result.recordset[0].media_photo_url;
+        if(!mediaPhotoUrl) {
+            throwError("Image not found!", 404);
+        }
         const stream = fs.createReadStream(mediaPhotoUrl);
         stream.on('error', () => {
            return res.status(404).json({
@@ -345,6 +370,9 @@ exports.getWorkshopImage = async (req, res, next) => {
             throwError("Could not find the file", 404);
         }
         const workshopPhotoUrl = result.recordset[0].photo_url;
+        if(!workshopPhotoUrl) {
+            throwError("Image not found!", 404);
+        }
         const stream = fs.createReadStream(workshopPhotoUrl);
         stream.on('error', () => {
            return res.status(404).json({
@@ -382,6 +410,9 @@ exports.getWorkshopReport = async (req, res, next) => {
             throwError("Could not find the file", 404);
         }
         const workshopReportUrl = result.recordset[0].report_url;
+        if(!workshopReportUrl) {
+            throwError("Document not found!", 404);
+        }
         const stream = fs.createReadStream(workshopReportUrl);
         stream.on('error', () => {
            return res.status(404).json({
@@ -419,6 +450,10 @@ exports.getWorkshopStmtOfExpenditure = async (req, res, next) => {
             throwError("Could not find the file", 404);
         }
         const workshopStmtOfExpenditureUrl = result.recordset[0].stmt_expenditure_url;
+        if(!workshopStmtOfExpenditureUrl) {
+            throwError("Document not found!", 404);
+        }
+        
         const stream = fs.createReadStream(workshopStmtOfExpenditureUrl);
         stream.on('error', () => {
            return res.status(404).json({
@@ -456,6 +491,9 @@ exports.getWorkshopCertificate = async (req, res, next) => {
             throwError("Could not find the file", 404);
         }
         const workshopCertificateUrl = result.recordset[0].certificate_url;
+        if(!workshopCertificateUrl) {
+            throwError("Document not found!", 404);
+        }
         const stream = fs.createReadStream(workshopCertificateUrl);
         stream.on('error', () => {
            return res.status(404).json({
@@ -480,6 +518,47 @@ exports.getWorkshopCertificate = async (req, res, next) => {
         stream.pipe(res);
     }
     catch(err) {
+        next(err);
+    }
+};
+
+exports.getWorkshopBrochure = async (req, res, next) => {
+    const fileId = req.params.fileId;
+
+    try {
+        const result = await WorkshopOtherDocs.findDocumentsByFileId(fileId);
+        if(result.recordset.length == 0) {
+            throwError("Could not find the file", 404);
+        }
+        const workshopBrochureUrl = result.recordset[0].brochure_url;
+        if(!workshopBrochureUrl) {
+            throwError("Document not found!", 404);
+        }
+        const stream = fs.createReadStream(workshopBrochureUrl);
+        stream.on('error', () => {
+           return res.status(404).json({
+            errors: [
+                {
+                    msg: "Could not find the file on server!",
+                    status: 404
+                }
+            ]
+           }); 
+        });
+        const fileType = workshopBrochureUrl.split('.').slice(-1);
+        let contentType = 'application/pdf';
+
+        if(fileType?.length > 0 && fileType[0] === 'png')
+            contentType = 'image/png';
+        else if(fileType?.length > 0 && (fileType[0] === 'jpg' || fileType[0] === 'jpeg')) 
+            contentType = 'image/jpeg';
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', 'attachment');
+        stream.pipe(res);
+    }
+    catch(err) {
+        console.log(err)
         next(err);
     }
 };
