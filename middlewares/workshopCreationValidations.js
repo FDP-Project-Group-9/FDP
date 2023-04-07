@@ -229,3 +229,14 @@ exports.deleteWorkshopResourcePersonsValidationRules = () => {
             .withMessage("Resource persons id is required!")
     ];
 };
+
+exports.workshopDocumentsDeletionValidationRules = () => {
+    return [
+        body('workshop_id')
+            .exists()
+            .withMessage("Workshop Id is required!"),
+        body('file_id')
+            .exists()
+            .withMessage("File id is required!")
+    ];
+};

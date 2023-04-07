@@ -4,12 +4,16 @@ const Institute = require("../models/institute");
 const WorkshopDetails = require("../models/workshopDetails");
 const User = require("../models/user");
 const Role = require("../models/roles");
-
-const { throwError } = require("../utils/helper");
-const { roles } = require("../utils/constants");
-const { sendOTP, verifyOTP } = require("../config/otp");
 const WorkshopResourcePersons = require("../models/workshopResourcePerson");
 const ResourcePersonDetails = require("../models/resourcePerson");
+const WorkshoPhotos = require("../models/workshopPhotos");
+
+const { throwError } = require("../utils/helper");
+const { roles, workshop } = require("../utils/constants");
+const { sendOTP, verifyOTP } = require("../config/otp");
+const { createWorkshopBrochureHandler } = require("../middlewares/workshopBrochure");
+const { removeFileByPath } = require("../config/fileDirectory");
+const WorkshopOtherDocs = require("../models/workshopOtherDocs");
 
 exports.createWorkshopDraft = async (req, res, next) => {
     const user = res.locals.user;
@@ -521,4 +525,60 @@ exports.deleteWorkshopResourcePersons = async (req, res, next) => {
     catch(err) {
         next(err);
     }
+};
+
+exports.createWorkshopBrochure = async (req, res, next) => {
+    const workshopId = req.body.workshop_id;
+    const userId = res.locals.user.user_id;
+
+    try {
+        const workshop = await Workshop.getWorkshopDetails(workshopId);
+        if(workshop.recordset[0].draft) {
+            throwError("Cannot create brochure before creating the workshop!", 400);
+        }
+        const workshopDetails = await WorkshopDetails.getDetails(workshopId);
+        if(!workshopDetails.recordset[0].workshop_approval_status) {
+            throwError("Cannot create brochure for non-approved!", 404);
+        }
+
+        const workshopOtherDocuments = await WorkshopOtherDocs.findDocumentsByWorkshopId(workshopId);
+        if(workshopOtherDocuments.recordset.length > 0 && workshopOtherDocuments.recordset[0].brochure_url) {
+            throwError("Brochure document already exists!", 409);
+        }
+
+        const userDetails = await User.findUserById(userId);
+        const instituteDetails = await Institute.findDetails(userId);
+        const resourcePersonsDetails = await WorkshopResourcePersons.findWorkshopResourcePersonsByWorkshopId(workshopId);
+        const workshopImages = await WorkshoPhotos.findWorkshopPhotos(workshopId);
+
+        createWorkshopBrochureHandler(
+            {
+                workshopDetails: workshopDetails.recordset[0],
+                coordinatorDetails: userDetails.recordset[0],
+                instituteDetails: instituteDetails.recordset[0],
+                resourcePersonsDetails: resourcePersonsDetails.recordsets[0],
+                workshopImagesUrls: workshopImages.recordsets[0]
+            },
+            async (fileUrl) => {
+                try {
+                    if(workshopOtherDocuments.recordset.length === 0) {
+                        await WorkshopOtherDocs.addWorkshopBrochure(fileUrl, workshopId);
+                    } 
+                    else {
+                        await WorkshopOtherDocs.updateWorkshopBrochure(fileUrl, workshopId);
+                    }
+                    res.status(200).json({
+                        msg: 'Workshop brochure created successfully!'
+                    });
+                }
+                catch(err) {
+                    next(err);
+                }
+            }
+        );
+    }
+    catch(err) {
+        next(err);
+    }
+
 };

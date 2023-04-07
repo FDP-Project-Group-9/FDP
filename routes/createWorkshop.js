@@ -8,7 +8,8 @@ const {
     getOTP,
     verifyOTP,
     addWorkshopResourcePersons,
-    deleteWorkshopResourcePersons
+    deleteWorkshopResourcePersons,
+    createWorkshopBrochure
 } = require('../controllers/createWorkshop');
 
 const { validationErrorHandler } = require("../utils/helper");
@@ -41,5 +42,7 @@ routes.get("/otp", getOTP);
 routes.post("/verify-otp", workshopIdValidation(), validationErrorHandler, verifyOTP);
 
 routes.put("/", workshopIdValidation(), validationErrorHandler, createWorkshop);
+
+routes.post("/brochure", createWorkshopBrochure);
 
 module.exports = routes;

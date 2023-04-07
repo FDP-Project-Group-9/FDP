@@ -179,6 +179,7 @@ exports.workshop_other_docs = {
         reportUrl: 'report_url',
         stmtExpenditureUrl: 'stmt_expenditure_url',
         certificateUrl: 'certificate_url',
+        brochureUrl: 'brochure_url',
         workshopId: 'workshop_id'
     }
 };
