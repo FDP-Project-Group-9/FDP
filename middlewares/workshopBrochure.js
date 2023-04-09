@@ -5,13 +5,7 @@ const uniqueFilename = require('unique-filename');
 const { throwError } = require("../utils/helper");
 const { removeFileByPath } = require("../config/fileDirectory");
 
-const formatDate = (date) => {
-    if(!date)
-        return "";
-    const newDate = new Date(date);
-    const options = {  year: 'numeric', month: 'long', day: 'numeric' };
-    return newDate.toLocaleDateString('en-in', options);
-};
+
 
 const createWorkshopDetailsList = (workshopDetails) => {
     const data = {

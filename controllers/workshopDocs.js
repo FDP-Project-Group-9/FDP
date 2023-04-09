@@ -1,3 +1,5 @@
+const fetch = (...args) =>
+	import('node-fetch').then(({default: fetch}) => fetch(...args));
 const fs = require('fs');
 
 const WorkshopMediaPhotos = require('../models/workshopMediaPhotos');
@@ -308,11 +310,22 @@ exports.deleteWorkshopBrochure = async (req, res, next) => {
             throwError("File not found!", 404);
         }
 
-        removeFileByPath(fileDetails.recordset[0][workshop_other_docs.colNames.brochureUrl]);
-
         await WorkshopOtherDocs.deleteWorkshopBrochure(fileId, workshopId);
-        res.status(200).json({
-            msg: "File deleted successfully!"
+
+        const brochureFileId = fileDetails.recordset[0][workshop_other_docs.colNames.brochureUrl];
+        fetch(`https://api.pdfmonkey.io/api/v1/documents/${brochureFileId}`, {
+            method: 'delete',
+            headers: {
+                'Authorization': `Bearer ${process.env.PDF_MONKEY_API_KEY}`
+            }
+        })
+        .then(() => {
+            res.status(200).json({
+                msg: "File deleted successfully!"
+            });
+        })
+        .catch(err => {
+            throw err;
         });
     }
     catch(err) {
@@ -530,35 +543,30 @@ exports.getWorkshopBrochure = async (req, res, next) => {
         if(result.recordset.length == 0) {
             throwError("Could not find the file", 404);
         }
-        const workshopBrochureUrl = result.recordset[0].brochure_url;
-        if(!workshopBrochureUrl) {
+        const workshopBrochureId = result.recordset[0].brochure_id;
+        if(!workshopBrochureId) {
             throwError("Document not found!", 404);
         }
-        const stream = fs.createReadStream(workshopBrochureUrl);
-        stream.on('error', () => {
-           return res.status(404).json({
-            errors: [
-                {
-                    msg: "Could not find the file on server!",
-                    status: 404
+        fetch(`https://api.pdfmonkey.io/api/v1/document_cards/${workshopBrochureId}`, {
+            method: 'get',
+            headers: {
+                'Authorization': `Bearer ${process.env.PDF_MONKEY_API_KEY}`
+            }
+        })
+        .then(response => response.json())
+        .then(response => {
+            const url = response.document_card.download_url;
+            res.status(200).json({
+                msg: "Document fetched!",
+                data: {
+                    url: url
                 }
-            ]
-           }); 
-        });
-        const fileType = workshopBrochureUrl.split('.').slice(-1);
-        let contentType = 'application/pdf';
-
-        if(fileType?.length > 0 && fileType[0] === 'png')
-            contentType = 'image/png';
-        else if(fileType?.length > 0 && (fileType[0] === 'jpg' || fileType[0] === 'jpeg')) 
-            contentType = 'image/jpeg';
-
-        res.setHeader('Content-Type', contentType);
-        res.setHeader('Content-Disposition', 'attachment');
-        stream.pipe(res);
+            });
+        })
+        .catch(err => { throw err });
     }
     catch(err) {
-        console.log(err)
+        // console.log(err);
         next(err);
     }
 };

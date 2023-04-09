@@ -258,7 +258,7 @@ CREATE TABLE workshop_other_docs (
 	report_url varchar(255),
 	stmt_expenditure_url varchar(255),
 	certificate_url varchar(255),
-	brochure_url varchar(255),
+	brochure_id varchar(255),
 	workshop_id int NOT NULL UNIQUE,
 	PRIMARY KEY (id),
 	FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id)

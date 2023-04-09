@@ -50,3 +50,11 @@ exports.getAllResults = (sqlQueryResult) => {
 exports.getFirstResult = (sqlQueryResult) => {
     return sqlQueryResult.recordset[0];
 };
+
+exports.formatDate = (date) => {
+    if(!date)
+        return "";
+    const newDate = new Date(date);
+    const options = {  year: 'numeric', month: 'long', day: 'numeric' };
+    return newDate.toLocaleDateString('en-in', options);
+};

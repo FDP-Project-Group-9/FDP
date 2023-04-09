@@ -1,3 +1,7 @@
+const fetch = (...args) =>
+	import('node-fetch').then(({default: fetch}) => fetch(...args));
+const fs = require('fs');
+
 const Workshop = require("../models/workshop");
 const CoordinatorDetails = require("../models/coordinatorDetails");
 const Institute = require("../models/institute");
@@ -8,12 +12,32 @@ const WorkshopResourcePersons = require("../models/workshopResourcePerson");
 const ResourcePersonDetails = require("../models/resourcePerson");
 const WorkshoPhotos = require("../models/workshopPhotos");
 
-const { throwError } = require("../utils/helper");
+const { throwError, formatDate } = require("../utils/helper");
 const { roles, workshop } = require("../utils/constants");
 const { sendOTP, verifyOTP } = require("../config/otp");
 const { createWorkshopBrochureHandler } = require("../middlewares/workshopBrochure");
 const { removeFileByPath } = require("../config/fileDirectory");
 const WorkshopOtherDocs = require("../models/workshopOtherDocs");
+
+require('dotenv').config();
+
+function base64_encode(file) {
+    // read binary data
+    var bitmap = fs.readFileSync(file, 'base64');
+    // convert binary data to base64 encoded strin
+    // console.log(`data:image/png;base64,${bitmap}`);
+    let contentType = 'image/png';
+
+    const fileType = file.split('.').slice(-1);
+    if(fileType?.length > 0 && fileType[0] === 'png')
+        contentType = 'image/png';
+    else if(fileType?.length > 0 && (fileType[0] === 'jpg' || fileType[0] === 'jpeg')) 
+        contentType = 'image/jpeg';
+
+    const base64File = `data:${contentType};base64,${bitmap}`;
+    return base64File;
+}
+
 
 exports.createWorkshopDraft = async (req, res, next) => {
     const user = res.locals.user;
@@ -536,46 +560,94 @@ exports.createWorkshopBrochure = async (req, res, next) => {
         if(workshop.recordset[0].draft) {
             throwError("Cannot create brochure before creating the workshop!", 400);
         }
-        const workshopDetails = await WorkshopDetails.getDetails(workshopId);
+        let workshopDetails = await WorkshopDetails.getDetails(workshopId);
         if(!workshopDetails.recordset[0].workshop_approval_status) {
             throwError("Cannot create brochure for non-approved!", 404);
         }
 
         const workshopOtherDocuments = await WorkshopOtherDocs.findDocumentsByWorkshopId(workshopId);
-        if(workshopOtherDocuments.recordset.length > 0 && workshopOtherDocuments.recordset[0].brochure_url) {
+        if(workshopOtherDocuments.recordset.length > 0 && workshopOtherDocuments.recordset[0].brochure_id) {
             throwError("Brochure document already exists!", 409);
         }
 
-        const userDetails = await User.findUserById(userId);
-        const instituteDetails = await Institute.findDetails(userId);
-        const resourcePersonsDetails = await WorkshopResourcePersons.findWorkshopResourcePersonsByWorkshopId(workshopId);
-        const workshopImages = await WorkshoPhotos.findWorkshopPhotos(workshopId);
+        let userDetails = await User.findUserById(userId);
+        let instituteDetails = await Institute.findDetails(userId);
+        let resourcePersonsDetails = await WorkshopResourcePersons.findWorkshopResourcePersonsByWorkshopId(workshopId);
+        let workshopImages = await WorkshoPhotos.findWorkshopPhotos(workshopId);
 
-        createWorkshopBrochureHandler(
-            {
-                workshopDetails: workshopDetails.recordset[0],
-                coordinatorDetails: userDetails.recordset[0],
-                instituteDetails: instituteDetails.recordset[0],
-                resourcePersonsDetails: resourcePersonsDetails.recordsets[0],
-                workshopImagesUrls: workshopImages.recordsets[0]
-            },
-            async (fileUrl) => {
-                try {
-                    if(workshopOtherDocuments.recordset.length === 0) {
-                        await WorkshopOtherDocs.addWorkshopBrochure(fileUrl, workshopId);
-                    } 
-                    else {
-                        await WorkshopOtherDocs.updateWorkshopBrochure(fileUrl, workshopId);
-                    }
-                    res.status(200).json({
-                        msg: 'Workshop brochure created successfully!'
-                    });
-                }
-                catch(err) {
-                    next(err);
-                }
+        workshopDetails = workshopDetails.recordset[0];
+        userDetails = userDetails.recordset[0];
+        instituteDetails = instituteDetails.recordset[0];
+        resourcePersonsDetails = resourcePersonsDetails.recordsets[0];
+        workshopImages = workshopImages.recordsets[0];
+
+        const payload = {
+            "workshop_details": {},
+            "speaker_details": [],
+            "images_data": []
+        };
+
+        payload.workshop_details = {
+            title: workshopDetails.title ?? 'N/A',
+            begin_date: formatDate(workshopDetails.begin_date) ?? 'N/A',
+            end_date: formatDate(workshopDetails.end_date) ?? 'N/A',
+            mode: workshopDetails.mode ?? 'N/A',
+            participant_intake: workshopDetails.participant_intake ?? 'N/A',
+            specialization_area: workshopDetails.area_specialization ?? 'N/A',
+            coordinator_name: userDetails.title ? `${userDetails.title} ${userDetails.first_name} ${userDetails.last_name}` : 'N/A',
+            coordinator_email_id: userDetails.email_id ?? 'N/A',
+            institute_name: instituteDetails.institute_name ?? 'N/A',
+            institute_address: `${instituteDetails.institute_address}, ${instituteDetails.district_name ?? ""}, ${instituteDetails.state_name ?? ""}`
+        };
+
+        payload.speaker_details = resourcePersonsDetails.map(personDetails => ({
+            name: personDetails.person_name ?? 'N/A',
+            designation: personDetails.designation ?? 'N/A',
+            specialization_area: personDetails.specialization ?? 'N/A',
+            email_id: personDetails.email_id ?? 'N/A',
+            organization_name: personDetails.organization_name ?? 'N/A'
+        }));
+
+        payload.images_data = workshopImages.map(image => base64_encode(image.photo_url) ?? '');
+
+        const body = {
+            "document": {
+                "document_template_id": `${process.env.PDF_DOCUMENT_TEMPLATE_ID}`,
+                "payload":  payload,
+                "status": "pending"
             }
-        );
+        };
+
+        // create brochure from pdf monkey
+        fetch('https://api.pdfmonkey.io/api/v1/documents', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.PDF_MONKEY_API_KEY}`
+            },
+            body: JSON.stringify(body)
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(resp => {
+            const brochureId = resp.document.id;
+            if(workshopOtherDocuments.recordset.length === 0) {
+                return WorkshopOtherDocs.addWorkshopBrochure(brochureId, workshopId);
+            } 
+            else {
+                return WorkshopOtherDocs.updateWorkshopBrochure(brochureId, workshopId);
+            }
+        })
+        .then(() => {
+            res.status(200).json({
+                msg: 'Workshop brochure created successfully!'
+            });
+        })
+        .catch(error => {
+            throw error;
+        })
+
     }
     catch(err) {
         next(err);

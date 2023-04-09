@@ -105,7 +105,7 @@ exports.getWorkshopDetails = async (req, res, next) => {
                 report_exists: !!result.report_url,
                 stmt_expenditure_exists: !!result.stmt_expenditure_url,
                 certificate_exists: !!result.certificate_url,
-                brochure_exists: !!result.brochure_url
+                brochure_exists: !!result.brochure_id
             }
         }
 
