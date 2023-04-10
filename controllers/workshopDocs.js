@@ -555,6 +555,16 @@ exports.getWorkshopBrochure = async (req, res, next) => {
         })
         .then(response => response.json())
         .then(response => {
+            if(response.errors && response.errors[0].status == 404) {
+                return res.status(404).json({
+                    errors: [
+                        {
+                            msg: "File has been expired, please delete the file and generate again!",
+                            status: 404
+                        }
+                    ]
+                });
+            }
             const url = response.document_card.download_url;
             res.status(200).json({
                 msg: "Document fetched!",
