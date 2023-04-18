@@ -5,6 +5,7 @@ const uploadWorkshopFilesRoutes = require('./workshopUploads');
 const deleteWorkshopFilesRoutes = require('./workshopDeleteFile');
 const getWorkshopFilesRoutes = require('./getWorkshopFiles');
 const quizRoutes=require('./quiz');
+const workshopParticipantsRoutes=require('./workshopParticipants')
 
 const { addWorkshopSpecialization, getWorkshopSpecializations } = require('../controllers/workshopSpecialization');
 const { verifyCoordinatorRole, verifyAdministratorRole } = require('../middlewares/userAuthorization');
@@ -45,4 +46,7 @@ routes.get("/", getAllWorkshops);
 //quiz Routes
 routes.use('/quiz',quizRoutes);
 
+
+//get Participants
+routes.use('/workshop-participants',verifyCoordinatorRole,workshopParticipantsRoutes)
 module.exports = routes;

@@ -36,7 +36,9 @@ exports.tableNames = {
     WORKSHOP_PHOTOS: 'workshop_photos',
     WORKSHOP_MEDIA_PHOTOS: 'workshop_media_photos',
     WORKSHOP_OTHER_DOCS: 'workshop_other_docs',
-    WORKSHOP_RESOURCE_PERSONS: 'workshop_resource_person'
+    WORKSHOP_RESOURCE_PERSONS: 'workshop_resource_person',
+    PARTICIPANT_DETAILS:'participants_details',
+    WORKSHOP_PARTICIPANTS:'workshop_participants'
 };
 
 exports.user = { 
@@ -206,3 +208,16 @@ exports.workshop_resource_persons = {
 };
 
 exports.fileSize = 2 * 1024 * 1024;
+
+
+exports.workshop_participants={
+    colNames:{ 
+        workshopId:'workshop_id',
+        participantId:'participant_id',
+        attendanceId:'attendance_id',
+        certificateGenerated:'certificate_generated',
+        quizAttempted:'quiz_attempted',
+        quizScore:'quiz_score',
+        approvalStatus:'participant_approval_status'
+    }
+}

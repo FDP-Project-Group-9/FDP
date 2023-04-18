@@ -219,6 +219,7 @@ create table workshop_participants (
 	certificate_generated BIT default 0,
 	quiz_attempted BIT default 0,
 	quiz_score int,
+	participant_approval_status int default 1,
 	FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id),
 	FOREIGN KEY (participant_id) REFERENCES users(user_id),
 	FOREIGN KEY (attendance_id) REFERENCES attendance(id)
