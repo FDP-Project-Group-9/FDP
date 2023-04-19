@@ -55,16 +55,26 @@ exports.approveParticipant=(async(req,res,next)=>{
 exports.getWorkshops=(async(req,res,next)=>{
      let data={}
      data.participantId=req.body.participantId;
-     data.status=req.body.status;
+    // status can be Approved,Rejected, pending, Applied
+     data.participant_approval_status=req.body.participant_approval_status;
+     // status can be completed, ongoing, upcoming
+     data.timeline_status=req.body.timeline_status
+      // no of enteries per api call
+     data.pageNo=Number(req.query.page_no??1);
+     data.perPage = Number(req.query.per_page ?? 10);
+     let responseData;
      try{
-     if(data.status===1){
-
-     }
-    else{
-    
-    }
-}
-catch(err){
+     const offset = (data.pageNo-1)*data.perPage;
+     const workshopDetails= await WorkshopPartiipant.getParticipantsWorkshop(offset,data);
+     responseData=workshopDetails[0].recordsets[0];
+     const totalWorkshopsCount = workshopDetails[1].recordset[0].total_rows;
+     res.status(200).json({
+        data: {
+            workshops: responseData,
+            total_workshops_count: totalWorkshopsCount
+        }
+    });
+          }     catch(err){
     return next(err)
 }
 })
