@@ -7,12 +7,11 @@ exports.workshopApply=(async(req,res,next)=>{
     requestData={
         workshopId:req.body.workshopId,
         participantId:req.body.participantId,
-        approvalStatus:req.body.approvalStatus
+        approvalStatus:2
     }
     let workshopParticipant=new WorkshopPartiipant(requestData);
     try{
         await workshopParticipant.addWorkshopParticipants();
-        console.log(1)
         return res.status(201).json({msg: "Participant Applied for the workshop"});
     }
     catch(err){
@@ -36,8 +35,8 @@ exports.getParticipants=(async(req,res,next)=>{
 exports.approveParticipant=(async(req,res,next)=>{
     let data={}
     data.workshopId=req.body.workshopId
-    data.approvalStatus=req.body.approvalStatus
     data.participantId=req.body.participantId
+    data.approvalStatus=req.body.approvalStatus.toLowerCase()==='rejected'?-1:3
     try{
          const result=await WorkshopPartiipant.updateStatus(data);
          if(result.rowsAffected[0] > 0){
@@ -65,7 +64,8 @@ exports.getWorkshops=(async(req,res,next)=>{
      let responseData;
      try{
      const offset = (data.pageNo-1)*data.perPage;
-     const workshopDetails= await WorkshopPartiipant.getParticipantsWorkshop(offset,data);
+    
+     const workshopDetails= await WorkshopPartiipant.getParticipantsWorkshop(offset,data.timeline_status,data);
      responseData=workshopDetails[0].recordsets[0];
      const totalWorkshopsCount = workshopDetails[1].recordset[0].total_rows;
      res.status(200).json({

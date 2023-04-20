@@ -67,7 +67,7 @@ module.exports = class CoordinatorDetails {
     };
  
 
-    static async getParticipantsWorkshop(offset=0,data){
+    static async getParticipantsWorkshop(offset=0,timeline_status,data){
         const db=getDB();
         let queryStmt =`SELECT
         ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.workshopId},
@@ -84,7 +84,7 @@ module.exports = class CoordinatorDetails {
         ${tableNames.WORKSHOP_DETAILS}
         ON
         ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.workshopId}=${tableNames.WORKSHOP_DETAILS}.${colNames.workshopId}
-        LEFY JOIN 
+        LEFT JOIN 
         ${tableNames.WORKSHOP_SPECIALIZATION}
         ON
         ${tableNames.WORKSHOP_DETAILS}.${workshopDetailsColNames.areaSpecializationId} = ${tableNames.WORKSHOP_SPECIALIZATION}.id
@@ -98,16 +98,17 @@ module.exports = class CoordinatorDetails {
         ${tableNames.WORKSHOP_DETAILS}
         ON
         ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.workshopId}=${tableNames.WORKSHOP_DETAILS}.${colNames.workshopId}
-        LEFY JOIN 
+        LEFT JOIN 
         ${tableNames.WORKSHOP_SPECIALIZATION}
         ON
         ${tableNames.WORKSHOP_DETAILS}.${workshopDetailsColNames.areaSpecializationId} = ${tableNames.WORKSHOP_SPECIALIZATION}.id
         WHERE 
-        ${colNames.participantId}=${'@' + colNames.coordinatorId}
+        ${colNames.participantId}=${'@' + colNames.participantId}
         `;
         const currentDate = new Date()
+       
 
-        if(data.timeline_status){
+        if(timeline_status){
             switch(data.timeline_status){
                 case "ongoing": queryStmt += ` AND @current_date BETWEEN ${tableNames.WORKSHOP_DETAILS}.begin_date AND ${tableNames.WORKSHOP_DETAILS}.end_date`;
                                 queryStmt2 += ` AND @current_date BETWEEN ${tableNames.WORKSHOP_DETAILS}.begin_date AND ${tableNames.WORKSHOP_DETAILS}.end_date`;
@@ -119,35 +120,38 @@ module.exports = class CoordinatorDetails {
                                  queryStmt2 += ` AND @current_date < ${tableNames.WORKSHOP_DETAILS}.begin_date`;
             };
         }
-        if(data.participant_approval_status){
+        if(data.participant_approval_status!=undefined){
+            
             let status=data.participant_approval_status;
+             
             let status_id=1;
-            status.toLowerCase()==='rejected'?status_id=-1:status.toLowerCase()==='approved'?status_id=3:status_id=2;
-            queryStmt+=` AND ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.approvalStatus}=${'@' + colNames.approvalStatus}`;
-            queryStmt2+=` AND ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.approvalStatus}=${'@' + colNames.approvalStatus}`;
-        }
+            status_id=status.toLowerCase()==='rejected'?-1:status.toLowerCase()==='approved'?3:2;
            
+            queryStmt+=` AND ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.approvalStatus}=${status_id}`;
+            queryStmt2+=` AND ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.approvalStatus}=${status_id}`;
+        }
         queryStmt += `
-            ORDER BY ${tableNames.WORKSHOP}.${colNames.workshopId} DESC
+            ORDER BY ${colNames.workshopId} DESC
             OFFSET ${offset} ROWS
-            FETCH NEXT ${limit} ROWS ONLY
+            FETCH NEXT ${data.perPage} ROWS ONLY
         `;
-          
+        //   console.log(queryStmt)
         try{
             return await Promise.all([
                 db.request()
                     .input(colNames.participantId, dbTypes.Int, data.participantId)
                     .input('current_date', dbTypes.Date, currentDate)
-                    .input('approved_status', dbTypes.Bit, data.participant_approval_status)
+                    .input('participant_approval_status', dbTypes.Bit, data.participant_approval_status)
                     .query(queryStmt),
                 db.request()
                     .input(colNames.participantId, dbTypes.Int, data.participantId)
                     .input('current_date', dbTypes.Date, currentDate)
-                    .input('approved_status', dbTypes.Bit, data.participant_approval_status)
+                    .input('participant_approval_status', dbTypes.Bit, data.participant_approval_status)
                     .query(queryStmt2)
             ]);
         }
         catch(err){
+            // console.log(err)
             throwError(err.originalError.info.message, 500);   
         }
 
