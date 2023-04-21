@@ -1,6 +1,7 @@
 const express = require('express');
 const {
     createQuiz,
+    getQuizDetails,
     addQuestions,
     deleteQuiz,
     deleteQuestion,
@@ -19,6 +20,8 @@ const { verifyCoordinatorRole } = require('../middlewares/userAuthorization');
 const routes = express.Router();
 
 routes.put('/create_Quiz',verifyCoordinatorRole,quizValidationRules(),validationErrorHandler,createQuiz);
+
+routes.get('/get-quizDetails',getQuizDetails);
 
 routes.put('/addQuestion',verifyCoordinatorRole,questionValidationRules(),validationErrorHandler,addQuestions);
 

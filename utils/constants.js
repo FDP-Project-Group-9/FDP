@@ -135,7 +135,9 @@ exports.workshop_details = {
 exports.quizes={
     colNames:{
      quiz_id:'quiz_id',
-     quiz_name:'quiz_name'
+     quiz_name:'quiz_name',
+     workshopId:'workshop_id',
+     totalQuestions:'total_questions'
     }
 };
 

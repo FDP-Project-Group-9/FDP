@@ -119,7 +119,10 @@ IF OBJECT_ID(N'quizes', N'U') is null
 create table quizes(
 	id int IDENTITY(1,1),
 	quiz_name varchar (50),
+	workshop_id int NOT NULL
+	total_questons int default 0
 	PRIMARY KEY (id)
+	FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id),
 );
 GO
 
