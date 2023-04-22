@@ -194,12 +194,15 @@ GO
 IF OBJECT_ID(N'attendance', N'U') is null
  create table attendance (
 	id int IDENTITY(1,1),
+	workshop_id int NOT NULL,
+	participant_id int NOT NULL,
 	day1_attendance BIT default 0,
 	day2_attendance BIT default 0,
 	day3_attendance BIT default 0,
 	day4_attendance BIT default 0,
 	day5_attendance BIT default 0,
 	PRIMARY KEY (id)
+	FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id)
  );
 GO
 

@@ -38,7 +38,8 @@ exports.tableNames = {
     WORKSHOP_OTHER_DOCS: 'workshop_other_docs',
     WORKSHOP_RESOURCE_PERSONS: 'workshop_resource_person',
     PARTICIPANT_DETAILS:'participants_details',
-    WORKSHOP_PARTICIPANTS:'workshop_participants'
+    WORKSHOP_PARTICIPANTS:'workshop_participants',
+    ATTENDANCE:'attendance'
 };
 
 exports.user = { 
@@ -79,6 +80,19 @@ exports.workshop = {
         workshopDetailsId: 'workshop_details_id',
         draft: 'draft',
         otpVerified: 'otp_verified'
+    }
+};
+
+
+exports.attendance = {
+    colNames: {
+        workshopId: 'workshop_id',
+        participantId: 'participant_id',
+        day1:'day1_attendance',
+        day2:'day2_attendance',
+        day3:'day3_attendance',
+        day4:'day4_attendance',
+        day5:'day5_attendance',
     }
 };
 

@@ -31,7 +31,6 @@ routes.delete('/delete-question',verifyCoordinatorRole,validationErrorHandler,de
 
 routes.get('/getQuestions',validationErrorHandler,getQustions);
 
-routes.put('/evaluateParticipant',validationErrorHandler,evaluateParticipants);
 
 
 module.exports = routes;

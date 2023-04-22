@@ -4,7 +4,7 @@ const { colNames } = require("../utils/constants").workshop_participants;
 const { tableNames } = require("../utils/constants");
 const { colNames: workshopDetailsColNames } = require("../utils/constants").workshop_details;
 
-module.exports = class CoordinatorDetails {
+module.exports = class WorkshopParticipants {
     constructor (data){
         Object.assign(this, data);
     };
@@ -51,13 +51,15 @@ module.exports = class CoordinatorDetails {
     static async updateStatus(data) {
         const db = getDB();  
         const queryStmt =  `UPDATE ${tableNames.WORKSHOP_PARTICIPANTS} SET
-        ${colNames.approvalStatus} = ${'@' + colNames.approvalStatus}
+        ${colNames.approvalStatus} = ${'@' + colNames.approvalStatus},
+        ${colNames.attendanceId} = ${'@' + colNames.attendanceId}
         WHERE ${colNames.workshopId} = ${'@' + colNames.workshopId} and ${colNames.participantId} = ${'@' + colNames.participantId}`;
 
         try{
             return await db.request()
             .input(colNames.workshopId, dbTypes.Int, data.workshopId)
             .input(colNames.approvalStatus, dbTypes.Int, data.approvalStatus)
+            .input(colNames.attendanceId, dbTypes.Int, data.attendanceId)
             .input(colNames.participantId, dbTypes.Int, data.participantId)
             .query(queryStmt);
         }
@@ -66,6 +68,23 @@ module.exports = class CoordinatorDetails {
         }
     };
  
+    static async getParticipantWorkshopById(workshopId,participantId){
+        const db=getDB();
+        let query=`SELECT * FROM ${tableNames.WORKSHOP_PARTICIPANTS} 
+        WHERE
+        ${colNames.workshopId}=${'@' + colNames.workshopId} AND 
+        ${colNames.participantId}=${'@' + colNames.participantId} 
+        `;
+        try{
+            return await db.request()
+            .input(colNames.workshopId, dbTypes.Int, workshopId)
+            .input(colNames.participantId, dbTypes.Int, participantId)
+            .query(query);
+        }
+        catch(err){
+            throwError(err.originalError.info.message, 500);
+        }
+    }
 
     static async getParticipantsWorkshop(offset=0,timeline_status,data){
         const db=getDB();

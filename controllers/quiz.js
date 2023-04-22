@@ -72,7 +72,6 @@ exports.getQuizDetails=(async(req,res,next)=>{
     }
 })
 
-
 exports.addQuestions=(async(req,res,next)=>{
     const edit=req.query.edit;
     let requestData=new Object();
@@ -129,9 +128,6 @@ exports.addQuestions=(async(req,res,next)=>{
     }
     }
 })
-
-
-
 
 exports.deleteQuiz=(async(req,res,next)=>{
     const workshopId=req.body.workshopId
@@ -205,12 +201,18 @@ exports.deleteQuestion=(async(req,res,next)=>{
     }
 })
 
-
 exports.getQustions=(async(req,res,next)=>{
-    const id = req.body.quiz_id;
+    const id = req.body.workshopId
     try{
-           const result=await questions.getQuestionByFilters(id);
-           const results=result.recordsets
+        const result=await quizDetails.getquizDetails(id);
+        if(result.recordsets[0].length===0) {
+            throwError("Quiz not created for this Workshop",404)
+        }
+        quiz_id=result.recordsets[0][0].id;
+    try{
+
+           const result1=await questions.getQuestionByFilters(quiz_id);
+           const results=result1.recordsets
            return res.status(200).json({
            msg: "Quiz details successfully fetched!",
            data: results
@@ -219,9 +221,10 @@ exports.getQustions=(async(req,res,next)=>{
     catch(err){
         next(err);
     }
+}
+catch(err){
+    return next(err);
+}
 })
 
 
-exports.evaluateParticipants=(async(req,res,next)=>{
-    
-})
