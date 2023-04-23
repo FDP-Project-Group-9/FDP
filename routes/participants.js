@@ -17,7 +17,7 @@ routes.get('/workshop/participants/getWorkshops',validationErrorHandler,getWorks
 
 routes.get('/workshop/participant/getParticipantQuiz',validationErrorHandler,getQuizParticipant);
 
-routes.get('/workshop/evaluateScore',validationErrorHandler,evaluateScore)
+routes.put('/workshop/participant/evaluateScore',validationErrorHandler,evaluateScore)
 
 routes.get('/workshop/:participantId',validationErrorHandler,getParticipantDetailById)
 

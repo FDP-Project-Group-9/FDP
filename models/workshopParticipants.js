@@ -4,7 +4,7 @@ const { colNames } = require("../utils/constants").workshop_participants;
 const { tableNames } = require("../utils/constants");
 const { colNames: workshopDetailsColNames } = require("../utils/constants").workshop_details;
 const { colNames: userDetailscolNames } = require("../utils/constants").user;
-const {colNames : QuizDetails} = require('../utils/constants').quizes
+const {colNames : attendance} = require('../utils/constants').attendance
 const {colNames: questionDetails} =require('../utils/constants').questions
 
 module.exports = class WorkshopParticipants {
@@ -64,6 +64,25 @@ module.exports = class WorkshopParticipants {
             .input(colNames.approvalStatus, dbTypes.Int, data.approvalStatus)
             .input(colNames.attendanceId, dbTypes.Int, data.attendanceId)
             .input(colNames.participantId, dbTypes.Int, data.participantId)
+            .query(queryStmt);
+        }
+        catch(err){
+            throwError(err.originalError.info.message, 500);
+        }
+    };
+
+
+    static async updateQuizDetails(quizAttempt,Score,workshopId,participantId) {
+        const db = getDB();  
+        const queryStmt =  `UPDATE ${tableNames.WORKSHOP_PARTICIPANTS} SET
+        ${colNames.quizAttempted} = ${quizAttempt},
+        ${colNames.quizScore} = ${Score}
+        WHERE ${colNames.workshopId} = ${'@' + colNames.workshopId} and ${colNames.participantId} = ${'@' + colNames.participantId}`;
+
+        try{
+            return await db.request()
+            .input(colNames.workshopId, dbTypes.Int, workshopId)
+            .input(colNames.participantId, dbTypes.Int, participantId)
             .query(queryStmt);
         }
         catch(err){
@@ -266,6 +285,39 @@ module.exports = class WorkshopParticipants {
             throwError(err.originalError.info.message, 500);   
         }
 
+    }
+
+    static async getParticipantDetailsforWorkshop(workshopId,participantId){
+        const db=getDB();
+        const queryStmt=`SELECT
+        ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.participantId}, 
+        ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.workshopId}, 
+        ${colNames.quizAttempted},
+        ${colNames.certificateGenerated},
+        ${colNames.quizScore},
+        ${attendance.id},
+        ${attendance.day1},
+        ${attendance.day2},
+        ${attendance.day3},
+        ${attendance.day4},
+        ${attendance.day5}
+        FROM 
+        ${tableNames.WORKSHOP_PARTICIPANTS}
+        LEFT JOIN 
+        ${tableNames.ATTENDANCE}
+        ON 
+        ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.attendanceId}=${tableNames.ATTENDANCE}.${attendance.id}
+        WHERE
+        ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.participantId}=${participantId} AND 
+        ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.workshopId}=${workshopId}
+        `;
+        try{
+            return await db.request()
+            .query(queryStmt);
+        }
+        catch(err){
+            throwError(err.originalError.info.message, 500);
+        }
     }
     
 };

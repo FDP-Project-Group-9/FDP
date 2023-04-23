@@ -190,4 +190,27 @@ module.exports = class quizDetails {
          }
     }
 
+
+    static async getAnswersForQuiz(id){
+        const db=getDB();
+        let queryStmt = `SELECT 
+        ${tableNames.QUESTIONS}.${questionDetails.question_id},
+        ${tableNames.QUESTIONS}.${questionDetails.answer}
+        FROM
+        ${tableNames.QUESTIONS}
+        WHERE 
+        ${questionDetails.quiz_id} = ${id}`;
+        queryStmt += `
+        ORDER BY ${questionDetails.question_id} ASC
+        `;
+     
+        try {
+             return await db.request()
+                .query(queryStmt)
+            
+         }
+         catch(err) {
+           throwError(err.originalError.info.message, 500);
+         }
+    }
 };

@@ -162,13 +162,12 @@ exports.getQuizParticipant=(async(req,res,next)=>{
         const results=await quizDetails.getQuizDetailsForParticipant(offset,perPage,quizId);
         const  responseData=results[0].recordsets[0];
         const totalQuestionsCount = results[1].recordset[0].total_rows;
-         res.status(200).json({
+        return res.status(200).json({
             data: {
                 quiz: responseData,
                 total_questions_count: totalQuestionsCount
             }
         });
-        return res.status(200).json({data:responseData})
         }
         catch(err){
             return next(err);
@@ -184,7 +183,58 @@ exports.getQuizParticipant=(async(req,res,next)=>{
 })
 
 exports.evaluateScore=(async(req,res,next)=>{
-    
+    const workshopId=req.body.workshopId;
+    const participantId=req.body.participantId;
+    const participantAnswers=req.body.participant_answers
+    try{   
+        const response=await WorkshopDetails.getDetails(workshopId);
+        const quizId=response.recordset[0].quiz_id
+    try{
+        const resu=await WorkshopPartiipant.getParticipantDetailsforWorkshop(workshopId,participantId)
+        if(resu.recordset[0].quiz_attempted===true){
+            throwError("Quiz Already attempted by the participant",400);
+        }
+    try{
+    const results=await quizDetails.getAnswersForQuiz(quizId);
+    const data=results.recordset
+    let answerMap={}
+    let Score=0;
+    if(data.length!=participantAnswers.length){
+        throwError("All Questions are not attempted",400)
+    }
+    data.map((item)=>{
+        answerMap[item.question_id]=item.answer
+    })
+    participantAnswers.map((item)=>{
+        if(answerMap[item.questionId]===item.answer)  Score++;
+    })
+   
+    try{
+        let quizAttempt=1;
+        const responseData= await WorkshopPartiipant.updateQuizDetails(quizAttempt,Score,workshopId,participantId);
+        if(responseData.rowsAffected[0]>0){
+         return res.status(200).json({msg:"Quiz Attempted"})
+        }
+        else {
+            throwError("Participant already attempted the quiz",400)
+        }
+    }
+    catch(err){
+        console.log(err)
+        return next(err)
+    }
+}
+catch(err){
+    return next(err);
+}
+    }
+    catch(err){
+        return next(err);
+    }
+}
+catch(err){
+    return next(err)
+}
 })
 
 exports.updateAttendance=(async(req,res,net)=>{

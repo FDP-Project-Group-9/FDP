@@ -86,6 +86,7 @@ exports.workshop = {
 
 exports.attendance = {
     colNames: {
+        id:'id',
         workshopId: 'workshop_id',
         participantId: 'participant_id',
         day1:'day1_attendance',
