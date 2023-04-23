@@ -237,25 +237,63 @@ catch(err){
 }
 })
 
-exports.updateAttendance=(async(req,res,net)=>{
+exports.updateAttendance=(async(req,res,next)=>{
     let requestData={}
     requestData.workshopId=req.body.workshopId;
     requestData.participantId=req.body.participantId;
-    requestData.day1=req.body.day1
-    requestData.day2=req.body.day2
-    requestData.day3=req.body.day3
-    requestData.day4=req.body.day4
-    requestData.day5=req.body.day4
+    
+try{
+    const response = await Attendance.getAttendanceDetails( requestData.workshopId, requestData.participantId);
+    const data=response.recordset[0]
+    requestData.day1=data.day1
+    requestData.day2=data.day2
+    requestData.day3=data.day3
+    requestData.day4=data.day4
+    requestData.day5=data.day5
+
+    if(req.body.day1!=undefined)  requestData.day1=req.body.day1
+    if(req.body.day2!=undefined)  requestData.day2=req.body.day2
+    if(req.body.day3!=undefined)  requestData.day3=req.body.day3
+    if(req.body.day4!=undefined)  requestData.day4=req.body.day4
+    if(req.body.day5!=undefined)  requestData.day5=req.body.day5
+
    try{
        const result=await Attendance.updateAttendance(requestData)
-       req.status(200).json({msg:"Attendance gets updated"})
+       res.status(200).json({msg:"Attendance gets updated"})
    }
    catch(err){
     return next(err)
    }
+}
+catch(err){
+    return next(err);
+}
 
 })
 
 exports.getAttendance=(async(req,res,next)=>{
+    let requestData={}
+    requestData.workshopId=req.body.workshopId;
+    requestData.participantId=req.body.participantId;
     
+try{
+    const response = await Attendance.getAttendanceDetails( requestData.workshopId, requestData.participantId);
+    const data=response.recordset[0]
+    res.status(200).json({data:data})
+}
+catch(err){
+    return next(err);
+}
+})
+
+exports.getParticipantDetailWorkshop=(async(req,res,next)=>{
+    const workshopId=req.params.workshopId;
+    const participantId=req.params.participantId
+    try{ 
+    const response = await WorkshopPartiipant.getParticipantDetailsforWorkshop(workshopId,participantId);
+    const responseData=response.recordset
+    return res.status(200).json({data:responseData})
+    }catch(err){
+        return next(err);
+    }
 })

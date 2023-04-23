@@ -295,7 +295,7 @@ module.exports = class WorkshopParticipants {
         ${colNames.quizAttempted},
         ${colNames.certificateGenerated},
         ${colNames.quizScore},
-        ${attendance.id},
+        ${attendance.id} AS attendance_id,
         ${attendance.day1},
         ${attendance.day2},
         ${attendance.day3},
