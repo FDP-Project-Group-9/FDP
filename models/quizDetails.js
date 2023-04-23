@@ -138,4 +138,56 @@ module.exports = class quizDetails {
           }
       }
 
+
+      
+      static async getQuizDetailsForParticipant(offset=0,limit=10,id){
+      
+        const db=getDB();
+        let queryStmt = `SELECT 
+        ${tableNames.QUIZ}.${colNames.quiz_id},
+        ${tableNames.QUIZ}.${colNames.quiz_name},
+        ${tableNames.QUESTIONS}.${questionDetails.question_id},
+        ${tableNames.QUESTIONS}.${questionDetails.option1},
+        ${tableNames.QUESTIONS}.${questionDetails.option2},
+        ${tableNames.QUESTIONS}.${questionDetails.option3},
+        ${tableNames.QUESTIONS}.${questionDetails.option4},
+        ${tableNames.QUESTIONS}.${questionDetails.questStmt},
+        ${tableNames.QUESTIONS}.${questionDetails.answer}
+        FROM
+        ${tableNames.QUIZ}
+        LEFT JOIN
+        ${tableNames.QUESTIONS}
+        ON
+        ${tableNames.QUIZ}.${colNames.quiz_id}=${tableNames.QUESTIONS}.${questionDetails.quiz_id}
+        WHERE 
+        ${questionDetails.quiz_id} = ${id}`;
+      
+        queryStmt += `
+        ORDER BY ${questionDetails.question_id} DESC
+        OFFSET ${offset} ROWS
+        FETCH NEXT ${limit} ROWS ONLY
+        `;
+
+        let queryStmt2=`SELECT count(*) as total_rows FROM 
+         ${tableNames.QUIZ}
+        LEFT JOIN
+        ${tableNames.QUESTIONS}
+        ON
+        ${tableNames.QUIZ}.${colNames.quiz_id}=${tableNames.QUESTIONS}.${questionDetails.quiz_id}
+        WHERE 
+        ${questionDetails.quiz_id} = ${id}`;
+
+        try {
+             return await Promise.all([ 
+            db.request()
+                .query(queryStmt),
+            db.request()
+                .query(queryStmt2)
+             ])
+         }
+         catch(err) {
+           throwError(err.originalError.info.message, 500);
+         }
+    }
+
 };

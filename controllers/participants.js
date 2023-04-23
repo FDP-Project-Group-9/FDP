@@ -1,6 +1,10 @@
 
 const WorkshopPartiipant=require('../models/workshopParticipants')
-const Attendance= require('../models/arttendance')
+const Attendance= require('../models/arttendance');
+const WorkshopDetails=require('../models/workshopDetails')
+const Quiz=require('../models/quizDetails');
+const { throwError } = require('../utils/helper');
+const quizDetails = require('../models/quizDetails');
 
 exports.workshopApply=(async(req,res,next)=>{
     let requestData=new Object();
@@ -23,13 +27,45 @@ exports.workshopApply=(async(req,res,next)=>{
 })
 
 
-exports.getParticipants=(async(req,res,next)=>{
-    const workshopId=req.body.workshopId
-    try{
-      
+exports.getAllParticipants=(async(req,res,next)=>{
+     const workshopId=req.body.workshopId
+     // status can be Approved,Rejected, pending, Applied
+     let  approvalStatus=req.body.approvalStatus;
+     // no of enteries per api call
+     let pageNo=Number(req.query.page_no??1);
+     let perPage = Number(req.query.per_page ?? 10);
+     try{
+     const offset = (pageNo-1)*perPage;
+     const results=await WorkshopPartiipant.getAllparticipants(offset,perPage,workshopId,approvalStatus);
+     const  responseData=results[0].recordsets[0];
+     const totalWorkshopsCount = results[1].recordset[0].total_rows;
+      res.status(200).json({
+         data: {
+             workshops: responseData,
+             total_workshops_count: totalWorkshopsCount
+         }
+     });
     }
     catch(err){
         return next(err)
+    }
+})
+
+
+exports.getParticipantDetailById=(async(req,res,next)=>{
+    const participantId=req.params.participantId
+    try{
+     const result=await WorkshopPartiipant.getParticipantDetailsById(participantId)
+     if(result.recordset.length===0){
+        throwError("No Profile found for this user",400)
+     }
+     console.log(result)
+     res.status(200).json({
+        data:result.recordset[0]
+     })
+    }
+    catch(err){
+        return next(err);
     }
 })
 
@@ -105,6 +141,48 @@ exports.getWorkshops=(async(req,res,next)=>{
 }
 })
 
+
+exports.getQuizParticipant=(async(req,res,next)=>{
+   const workshopId=req.body.workshopId
+   const participantId=req.body.participantId
+      // no of enteries per api call
+      let pageNo=Number(req.query.page_no??1);
+      let perPage = Number(req.query.per_page ?? 10);
+   try{
+        const result=await WorkshopPartiipant.getParticipantWorkshopById(workshopId,participantId);
+        if(result.recordset.length===0){
+            throwError("Participant Doesn't applied for the workshop",400);
+        }
+        try{   
+            const response=await WorkshopDetails.getDetails(workshopId);
+            const quizId=response.recordset[0].quiz_id
+        try{
+            const offset = (pageNo-1)*perPage;
+
+        const results=await quizDetails.getQuizDetailsForParticipant(offset,perPage,quizId);
+        const  responseData=results[0].recordsets[0];
+        const totalQuestionsCount = results[1].recordset[0].total_rows;
+         res.status(200).json({
+            data: {
+                quiz: responseData,
+                total_questions_count: totalQuestionsCount
+            }
+        });
+        return res.status(200).json({data:responseData})
+        }
+        catch(err){
+            return next(err);
+        }
+    }
+    catch(err){
+        return next(err)
+    }
+    }
+   catch(err){
+    return next(err);
+   }
+})
+
 exports.evaluateScore=(async(req,res,next)=>{
     
 })
@@ -126,4 +204,8 @@ exports.updateAttendance=(async(req,res,net)=>{
     return next(err)
    }
 
+})
+
+exports.getAttendance=(async(req,res,next)=>{
+    
 })

@@ -21,7 +21,7 @@ const routes = express.Router();
 
 routes.put('/create_Quiz',verifyCoordinatorRole,quizValidationRules(),validationErrorHandler,createQuiz);
 
-routes.get('/get-quizDetails',getQuizDetails);
+routes.get('/get-quizDetails',validationErrorHandler,getQuizDetails);
 
 routes.put('/addQuestion',verifyCoordinatorRole,questionValidationRules(),validationErrorHandler,addQuestions);
 

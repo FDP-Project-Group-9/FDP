@@ -3,6 +3,9 @@ const { dbTypes, throwError } = require("../utils/helper");
 const { colNames } = require("../utils/constants").workshop_participants;
 const { tableNames } = require("../utils/constants");
 const { colNames: workshopDetailsColNames } = require("../utils/constants").workshop_details;
+const { colNames: userDetailscolNames } = require("../utils/constants").user;
+const {colNames : QuizDetails} = require('../utils/constants').quizes
+const {colNames: questionDetails} =require('../utils/constants').questions
 
 module.exports = class WorkshopParticipants {
     constructor (data){
@@ -67,6 +70,67 @@ module.exports = class WorkshopParticipants {
             throwError(err.originalError.info.message, 500);
         }
     };
+
+
+    static async getAllparticipants(offset=0,limit=10,workshopId,approvalStatus){
+       const db=getDB();
+       let queryStmt=`SELECT ${colNames.participantId},
+       ${tableNames.USERS}.${userDetailscolNames.title},
+       ${tableNames.USERS}.${userDetailscolNames.firstName},
+       ${tableNames.USERS}.${userDetailscolNames.lastName},
+       ${tableNames.USERS}.${userDetailscolNames.emailId},
+       ${tableNames.USERS}.${userDetailscolNames.gender},
+       ${tableNames.USERS}.${userDetailscolNames.mobileNo},
+       ${tableNames.USERS}.${userDetailscolNames.dob}
+        FROM ${tableNames.WORKSHOP_PARTICIPANTS}
+        LEFT JOIN 
+        ${tableNames.USERS}
+        ON 
+        ${tableNames.USERS}.${userDetailscolNames.userId}=${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.participantId}
+        WHERE
+        ${colNames.workshopId}=${workshopId}
+       `;
+   
+       let queryStmt2=`SELECT count(*) as total_rows FROM 
+        ${tableNames.WORKSHOP_PARTICIPANTS}
+        LEFT JOIN 
+        ${tableNames.USERS}
+        ON 
+        ${tableNames.USERS}.${userDetailscolNames.userId}=${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.participantId}
+        WHERE
+        ${colNames.workshopId}=${workshopId}
+       `;
+      
+       if(approvalStatus!=undefined){
+        let status_id=1;
+        status_id=approvalStatus.toLowerCase()==='rejected'?-1:approvalStatus.toLowerCase()==='approved'?3:2;
+        console.log(status_id)
+        queryStmt+=` AND ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.approvalStatus}=${status_id}`;
+        queryStmt2+=` AND ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.approvalStatus}=${status_id}`;
+    }
+    queryStmt += `
+        ORDER BY ${colNames.participantId} DESC
+        OFFSET ${offset} ROWS
+        FETCH NEXT ${limit} ROWS ONLY
+    `;
+      
+       try{
+        return await Promise.all([ 
+            db.request()
+                .query(queryStmt),
+            db.request()
+                .query(queryStmt2)
+        ])
+
+    }
+    catch(err){
+        // console.log(err)
+        throwError(err.originalError.info.message, 500);   
+    }
+
+    }
+   
+ 
  
     static async getParticipantWorkshopById(workshopId,participantId){
         const db=getDB();
@@ -83,6 +147,34 @@ module.exports = class WorkshopParticipants {
         }
         catch(err){
             throwError(err.originalError.info.message, 500);
+        }
+    }
+
+    static async getParticipantDetailsById(id){
+        const db=getDB();
+        let queryStmt=`SELECT   ${tableNames.USERS}.${userDetailscolNames.userId},
+        ${tableNames.USERS}.${userDetailscolNames.title},
+        ${tableNames.USERS}.${userDetailscolNames.firstName},
+        ${tableNames.USERS}.${userDetailscolNames.lastName},
+        ${tableNames.USERS}.${userDetailscolNames.emailId},
+        ${tableNames.USERS}.${userDetailscolNames.gender},
+        ${tableNames.USERS}.${userDetailscolNames.mobileNo},
+        ${tableNames.USERS}.${userDetailscolNames.dob}
+         FROM ${tableNames.USERS}
+         WHERE
+         ${tableNames.USERS}.${userDetailscolNames.userId}=${id} AND 
+         ${userDetailscolNames.roleId}=3
+        `;
+
+        try{
+            return await db.request()
+                    .query(queryStmt)
+            
+    
+        }
+        catch(err){
+           
+            throwError(err.originalError.info.message, 500);   
         }
     }
 

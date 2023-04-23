@@ -1,6 +1,6 @@
 const express = require('express');
 const {
-    getParticipants,
+    getAllParticipants,
     approveParticipant,
     updateAttendance
 }=require('../controllers/participants')
@@ -11,7 +11,7 @@ const routes = express.Router();
 
 
 
-routes.get("/workshop/getParticipants",validationErrorHandler, getParticipants);
+routes.get("/workshop/getParticipants",validationErrorHandler, getAllParticipants);
 
 //Accept/Reject Participants
 routes.put("/workshop/approve-participant",validationErrorHandler,approveParticipant)

@@ -62,7 +62,8 @@ exports.getQuizDetails=(async(req,res,next)=>{
     const workshopId=req.body.workshopId;
     try{
        const responseData=await quizDetails.getquizDetails(workshopId);
-       if(result.recordsets[0].length===0) {
+       console.log(responseData)
+       if(responseData.recordset[0].length===0) {
         throwError("Quiz not created for this Workshop",404)
     }
        return res.status(200).json({data:responseData.recordsets[0]});
@@ -203,6 +204,9 @@ exports.deleteQuestion=(async(req,res,next)=>{
 
 exports.getQustions=(async(req,res,next)=>{
     const id = req.body.workshopId
+    let pageNo=Number(req.query.page_no??1);
+    let perPage = Number(req.query.per_page ?? 10);
+
     try{
         const result=await quizDetails.getquizDetails(id);
         if(result.recordsets[0].length===0) {
@@ -210,12 +214,16 @@ exports.getQustions=(async(req,res,next)=>{
         }
         quiz_id=result.recordsets[0][0].id;
     try{
-
-           const result1=await questions.getQuestionByFilters(quiz_id);
-           const results=result1.recordsets
+        const offset = (pageNo-1)*perPage;
+           const result1=await questions.getQuestionByFilters(offset,perPage,quiz_id);
+           const  responseData=result1[0].recordsets[0];
+           const totalQuestionsCount = result1[1].recordset[0].total_rows;
            return res.status(200).json({
            msg: "Quiz details successfully fetched!",
-           data: results
+           data: {
+            quiz: responseData,
+            total_questions_count: totalQuestionsCount
+        }
        });
     }
     catch(err){

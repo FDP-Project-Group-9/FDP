@@ -2,7 +2,9 @@ const express = require('express');
 const {
     workshopApply,
     getWorkshops,
-    evaluateScore
+    evaluateScore,
+    getParticipantDetailById,
+    getQuizParticipant
 }=require('../controllers/participants')
 const {workshopParticipantValidaion} =require('../middlewares/participantApplicationValidation')
 const { validationErrorHandler } = require('../utils/helper');
@@ -13,6 +15,10 @@ routes.post("/workshop/participant/apply",workshopParticipantValidaion(),validat
 
 routes.get('/workshop/participants/getWorkshops',validationErrorHandler,getWorkshops);
 
+routes.get('/workshop/participant/getParticipantQuiz',validationErrorHandler,getQuizParticipant);
+
 routes.get('/workshop/evaluateScore',validationErrorHandler,evaluateScore)
+
+routes.get('/workshop/:participantId',validationErrorHandler,getParticipantDetailById)
 
 module.exports = routes;
