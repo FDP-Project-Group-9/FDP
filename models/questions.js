@@ -1,6 +1,7 @@
 const { getDB } = require("../config/db");
 const { dbTypes, throwError } = require("../utils/helper");
 const { colNames } = require("../utils/constants").questions;
+const { colNames:quizDetails } = require("../utils/constants").quizes;
 const { tableNames } = require("../utils/constants");
 
 module.exports = class Questions {
@@ -134,20 +135,54 @@ module.exports = class Questions {
           }
       }
 
-        static async getQuestionByFilters(id){
-            const db=getDB();
-            let queryStmt = `SELECT * FROM ${tableNames.QUESTIONS}`;
-            if(id!=undefined)
-            {
-                queryStmt+=` WHERE ${colNames.quiz_id} = ${'@' + colNames.quiz_id}`;
-            }
-            try {
-                return await db.request()
-                .input('quiz_id',dbTypes.Int,id)
-                .query(queryStmt);
-              }
+        static async getQuestionByFilters(offset=0,limit=10,id){
+             const db=getDB();
+             let queryStmt = `SELECT 
+             ${tableNames.QUIZ}.${quizDetails.quiz_id},
+             ${tableNames.QUIZ}.${quizDetails.quiz_name},
+             ${tableNames.QUESTIONS}.${colNames.question_id},
+             ${tableNames.QUESTIONS}.${colNames.option1},
+             ${tableNames.QUESTIONS}.${colNames.option2},
+             ${tableNames.QUESTIONS}.${colNames.option3},
+             ${tableNames.QUESTIONS}.${colNames.option4},
+             ${tableNames.QUESTIONS}.${colNames.questStmt},
+             ${tableNames.QUESTIONS}.${colNames.answer}
+             FROM
+             ${tableNames.QUIZ}
+             LEFT JOIN 
+             ${tableNames.QUESTIONS}
+             ON
+             ${tableNames.QUIZ}.${quizDetails.quiz_id}=${tableNames.QUESTIONS}.${colNames.quiz_id}
+             WHERE 
+             ${colNames.quiz_id} = ${id}`;
+           
+             queryStmt += `
+             ORDER BY ${colNames.question_id} DESC
+             OFFSET ${offset} ROWS
+             FETCH NEXT ${limit} ROWS ONLY
+             `;
+
+             let queryStmt2=`SELECT count(*) as total_rows FROM 
+         ${tableNames.QUIZ}
+        LEFT JOIN
+        ${tableNames.QUESTIONS}
+        ON
+        ${tableNames.QUIZ}.${quizDetails.quiz_id}=${tableNames.QUESTIONS}.${colNames.quiz_id}
+        WHERE 
+        ${quizDetails.quiz_id} = ${id}`;
+
+        try {
+             return await Promise.all([ 
+            db.request()
+                .query(queryStmt),
+            db.request()
+                .query(queryStmt2)
+             ])
+         }
               catch(err) {
                 throwError(err.originalError.info.message, 500);
               }
         }
+
+
     };

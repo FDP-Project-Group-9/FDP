@@ -36,7 +36,10 @@ exports.tableNames = {
     WORKSHOP_PHOTOS: 'workshop_photos',
     WORKSHOP_MEDIA_PHOTOS: 'workshop_media_photos',
     WORKSHOP_OTHER_DOCS: 'workshop_other_docs',
-    WORKSHOP_RESOURCE_PERSONS: 'workshop_resource_person'
+    WORKSHOP_RESOURCE_PERSONS: 'workshop_resource_person',
+    PARTICIPANT_DETAILS:'participants_details',
+    WORKSHOP_PARTICIPANTS:'workshop_participants',
+    ATTENDANCE:'attendance'
 };
 
 exports.user = { 
@@ -77,6 +80,20 @@ exports.workshop = {
         workshopDetailsId: 'workshop_details_id',
         draft: 'draft',
         otpVerified: 'otp_verified'
+    }
+};
+
+
+exports.attendance = {
+    colNames: {
+        id:'id',
+        workshopId: 'workshop_id',
+        participantId: 'participant_id',
+        day1:'day1_attendance',
+        day2:'day2_attendance',
+        day3:'day3_attendance',
+        day4:'day4_attendance',
+        day5:'day5_attendance',
     }
 };
 
@@ -132,8 +149,10 @@ exports.workshop_details = {
 
 exports.quizes={
     colNames:{
-     quiz_id:'quiz_id',
-     quiz_name:'quiz_name'
+     quiz_id:'id',
+     quiz_name:'quiz_name',
+     workshopId:'workshop_id',
+     totalQuestions:'total_questions'
     }
 };
 
@@ -206,3 +225,16 @@ exports.workshop_resource_persons = {
 };
 
 exports.fileSize = 2 * 1024 * 1024;
+
+
+exports.workshop_participants={
+    colNames:{ 
+        workshopId:'workshop_id',
+        participantId:'participant_id',
+        attendanceId:'attendance_id',
+        certificateGenerated:'certificate_generated',
+        quizAttempted:'quiz_attempted',
+        quizScore:'quiz_score',
+        approvalStatus:'participant_approval_status'
+    }
+}

@@ -1,6 +1,7 @@
 const express = require('express');
 const {
     createQuiz,
+    getQuizDetails,
     addQuestions,
     deleteQuiz,
     deleteQuestion,
@@ -20,6 +21,8 @@ const routes = express.Router();
 
 routes.put('/create_Quiz',verifyCoordinatorRole,quizValidationRules(),validationErrorHandler,createQuiz);
 
+routes.get('/get-quizDetails',validationErrorHandler,getQuizDetails);
+
 routes.put('/addQuestion',verifyCoordinatorRole,questionValidationRules(),validationErrorHandler,addQuestions);
 
 routes.delete('/delete-quiz',verifyCoordinatorRole,validationErrorHandler,deleteQuiz);
@@ -28,7 +31,6 @@ routes.delete('/delete-question',verifyCoordinatorRole,validationErrorHandler,de
 
 routes.get('/getQuestions',validationErrorHandler,getQustions);
 
-routes.put('/evaluateParticipant',validationErrorHandler,evaluateParticipants);
 
 
 module.exports = routes;

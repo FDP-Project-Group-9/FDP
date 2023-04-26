@@ -119,7 +119,10 @@ IF OBJECT_ID(N'quizes', N'U') is null
 create table quizes(
 	id int IDENTITY(1,1),
 	quiz_name varchar (50),
+	workshop_id int NOT NULL
+	total_questons int default 0
 	PRIMARY KEY (id)
+	FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id),
 );
 GO
 
@@ -191,12 +194,15 @@ GO
 IF OBJECT_ID(N'attendance', N'U') is null
  create table attendance (
 	id int IDENTITY(1,1),
+	workshop_id int NOT NULL,
+	participant_id int NOT NULL,
 	day1_attendance BIT default 0,
 	day2_attendance BIT default 0,
 	day3_attendance BIT default 0,
 	day4_attendance BIT default 0,
 	day5_attendance BIT default 0,
 	PRIMARY KEY (id)
+	FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id)
  );
 GO
 
@@ -219,6 +225,7 @@ create table workshop_participants (
 	certificate_generated BIT default 0,
 	quiz_attempted BIT default 0,
 	quiz_score int,
+	participant_approval_status int default 1,
 	FOREIGN KEY (workshop_id) REFERENCES workshops(workshop_id),
 	FOREIGN KEY (participant_id) REFERENCES users(user_id),
 	FOREIGN KEY (attendance_id) REFERENCES attendance(id)

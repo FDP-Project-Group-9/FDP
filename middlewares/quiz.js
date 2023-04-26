@@ -1,7 +1,7 @@
 const { body } = require("express-validator");
 
 const resourcePerson = require("../models/resourcePerson");
-const quizDetails=require("../models/quizDetails")
+const QuizDetails=require("../models/quizDetails")
 const Questions=require("../models/questions")
 
 
@@ -19,7 +19,32 @@ exports.quizValidationRules=()=>{
     .withMessage("Quiz Name is required!")
     .bail()
     .isLength({min: 1, max: 50})
-    .withMessage("Quiz Name must have atleaat 1 character and atmost 50 characters")
+    .withMessage("Quiz Name must have atleaat 1 character and atmost 50 characters"),
+
+    body("workshopId")
+    .exists()
+    .withMessage("Workshop Id is required!")
+    .bail()
+    .custom(async workshopId => {
+        try{
+            const result = await QuizDetails.getquizDetails(workshopId);
+            if(result.recordset.length > 0)
+                return Promise.reject(
+                    {
+                        errorMsg: "Quiz already exists for this workshop!",
+                        status: 409
+                    }
+                );           
+        }
+        catch(err){
+            return Promise.reject(
+                { 
+                    errorMsg: err.msg, 
+                    status: err.status
+                }
+            );
+        }
+    })
 ]
 }
 
@@ -33,9 +58,6 @@ exports.questionValidationRules = () => {
             else
                return true;
         })
-        .bail()
-        .exists()
-        .withMessage("Quiz Id is required!")
         ,
             body("question_statement")
             .if((value, {req}) => {
