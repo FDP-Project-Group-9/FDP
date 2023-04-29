@@ -160,5 +160,5 @@ module.exports = class WorkshopDetails {
         catch(err){
             throwError(err.originalError.info.message, 500);
         }
-    }
+    };
 };

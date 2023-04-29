@@ -9,6 +9,8 @@ const User = require("../models/user");
 
 const { throwError, getAllResults, getFirstResult } = require("../utils/helper");
 const WorkshopResourcePersons = require("../models/workshopResourcePerson");
+const { getAllParticipants } = require("./participants");
+const { getAllparticipants } = require("../models/workshopParticipants");
 
 exports.getWorkshopDetails = async (req, res, next) => {
     const workshopId = req.params['workshop_id'];
@@ -28,7 +30,8 @@ exports.getWorkshopDetails = async (req, res, next) => {
                 certificate_exists: false,
                 brochure_exists: false
             }
-        }
+        },
+        applied_participants: []
     };
     let workshopDetails;
 
@@ -108,6 +111,9 @@ exports.getWorkshopDetails = async (req, res, next) => {
                 brochure_exists: !!result.brochure_id
             }
         }
+        
+        const appliedParticipants = await getAllparticipants(0, 1000, workshopId);
+        responseData.applied_participants = appliedParticipants[0].recordsets[0].map(data => data.participant_id);
 
         res.status(200).json({
             msg: "Workshop details successfully fetched!",

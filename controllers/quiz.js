@@ -59,14 +59,13 @@ exports.createQuiz=(async (req,res,next)=>{
 })
 
 exports.getQuizDetails=(async(req,res,next)=>{
-    const workshopId=req.body.workshopId;
+    const workshopId=req.query.workshopId;
     try{
        const responseData=await quizDetails.getquizDetails(workshopId);
-       console.log(responseData)
-       if(responseData.recordset[0].length===0) {
+       if(responseData.recordset.length===0) {
         throwError("Quiz not created for this Workshop",404)
     }
-       return res.status(200).json({data:responseData.recordsets[0]});
+       return res.status(200).json({data:responseData.recordset[0]});
     }
     catch(err){
         return next(err)
@@ -203,7 +202,7 @@ exports.deleteQuestion=(async(req,res,next)=>{
 })
 
 exports.getQustions=(async(req,res,next)=>{
-    const id = req.body.workshopId
+    const id = req.query.workshopId
     let pageNo=Number(req.query.page_no??1);
     let perPage = Number(req.query.per_page ?? 10);
 

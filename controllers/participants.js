@@ -28,9 +28,9 @@ exports.workshopApply=(async(req,res,next)=>{
 
 
 exports.getAllParticipants=(async(req,res,next)=>{
-     const workshopId=req.body.workshopId
+     const workshopId=req.query.workshopId
      // status can be Approved,Rejected, pending, Applied
-     let  approvalStatus=req.body.approvalStatus;
+     let  approvalStatus=req.query.approvalStatus;
      // no of enteries per api call
      let pageNo=Number(req.query.page_no??1);
      let perPage = Number(req.query.per_page ?? 10);
@@ -38,18 +38,18 @@ exports.getAllParticipants=(async(req,res,next)=>{
      const offset = (pageNo-1)*perPage;
      const results=await WorkshopPartiipant.getAllparticipants(offset,perPage,workshopId,approvalStatus);
      const  responseData=results[0].recordsets[0];
-     const totalWorkshopsCount = results[1].recordset[0].total_rows;
+     const totalParticipantsCount = results[1].recordset[0].total_rows;
       res.status(200).json({
          data: {
-             workshops: responseData,
-             total_workshops_count: totalWorkshopsCount
+             participants: responseData,
+             total_participants_count: totalParticipantsCount
          }
      });
     }
     catch(err){
         return next(err)
     }
-})
+});
 
 
 exports.getParticipantDetailById=(async(req,res,next)=>{
@@ -59,7 +59,6 @@ exports.getParticipantDetailById=(async(req,res,next)=>{
      if(result.recordset.length===0){
         throwError("No Profile found for this user",400)
      }
-     console.log(result)
      res.status(200).json({
         data:result.recordset[0]
      })
@@ -115,11 +114,11 @@ exports.approveParticipant=(async(req,res,next)=>{
 
 exports.getWorkshops=(async(req,res,next)=>{
      let data={}
-     data.participantId=req.body.participantId;
+     data.participantId=Number(req.query.participantId);
     // status can be Approved,Rejected, pending, Applied
-     data.participant_approval_status=req.body.participant_approval_status;
-     // status can be completed, ongoing, upcoming
-     data.timeline_status=req.body.timeline_status
+     data.participant_approval_status=req.query.participant_approval_status;
+     // status can be completed, on going, upcoming
+     data.timeline_status=req.query.timeline_status
       // no of enteries per api call
      data.pageNo=Number(req.query.page_no??1);
      data.perPage = Number(req.query.per_page ?? 10);
@@ -143,8 +142,8 @@ exports.getWorkshops=(async(req,res,next)=>{
 
 
 exports.getQuizParticipant=(async(req,res,next)=>{
-   const workshopId=req.body.workshopId
-   const participantId=req.body.participantId
+   const workshopId=req.query.workshopId
+   const participantId=req.query.participantId
       // no of enteries per api call
       let pageNo=Number(req.query.page_no??1);
       let perPage = Number(req.query.per_page ?? 10);
@@ -273,8 +272,8 @@ catch(err){
 
 exports.getAttendance=(async(req,res,next)=>{
     let requestData={}
-    requestData.workshopId=req.body.workshopId;
-    requestData.participantId=req.body.participantId;
+    requestData.workshopId=req.query.workshopId;
+    requestData.participantId=req.query.participantId;
     
 try{
     const response = await Attendance.getAttendanceDetails( requestData.workshopId, requestData.participantId);
@@ -291,7 +290,7 @@ exports.getParticipantDetailWorkshop=(async(req,res,next)=>{
     const participantId=req.params.participantId
     try{ 
     const response = await WorkshopPartiipant.getParticipantDetailsforWorkshop(workshopId,participantId);
-    const responseData=response.recordset
+    const responseData=response.recordset[0];
     return res.status(200).json({data:responseData})
     }catch(err){
         return next(err);

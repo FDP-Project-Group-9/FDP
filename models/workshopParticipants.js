@@ -100,7 +100,8 @@ module.exports = class WorkshopParticipants {
        ${tableNames.USERS}.${userDetailscolNames.emailId},
        ${tableNames.USERS}.${userDetailscolNames.gender},
        ${tableNames.USERS}.${userDetailscolNames.mobileNo},
-       ${tableNames.USERS}.${userDetailscolNames.dob}
+       ${tableNames.USERS}.${userDetailscolNames.dob},
+       ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.approvalStatus}
         FROM ${tableNames.WORKSHOP_PARTICIPANTS}
         LEFT JOIN 
         ${tableNames.USERS}
@@ -120,7 +121,7 @@ module.exports = class WorkshopParticipants {
         ${colNames.workshopId}=${workshopId}
        `;
       
-       if(approvalStatus!=undefined){
+       if(approvalStatus!=undefined && approvalStatus.trim().length > 0 && approvalStatus != "all"){
         let status_id=1;
         status_id=approvalStatus.toLowerCase()==='rejected'?-1:approvalStatus.toLowerCase()==='approved'?3:2;
         console.log(status_id)
@@ -250,7 +251,7 @@ module.exports = class WorkshopParticipants {
                                  queryStmt2 += ` AND @current_date < ${tableNames.WORKSHOP_DETAILS}.begin_date`;
             };
         }
-        if(data.participant_approval_status!=undefined){
+        if(data.participant_approval_status!=undefined && data.participant_approval_status != 'all'){
             
             let status=data.participant_approval_status;
              
@@ -292,6 +293,7 @@ module.exports = class WorkshopParticipants {
         const queryStmt=`SELECT
         ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.participantId}, 
         ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.workshopId}, 
+        ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.approvalStatus}, 
         ${colNames.quizAttempted},
         ${colNames.certificateGenerated},
         ${colNames.quizScore},
@@ -300,13 +302,24 @@ module.exports = class WorkshopParticipants {
         ${attendance.day2},
         ${attendance.day3},
         ${attendance.day4},
-        ${attendance.day5}
+        ${attendance.day5},
+        ${tableNames.USERS}.title,
+        ${tableNames.USERS}.first_name,
+        ${tableNames.USERS}.last_name,
+        ${tableNames.USERS}.gender,
+        ${tableNames.USERS}.mobile_no,
+        ${tableNames.USERS}.dob
         FROM 
         ${tableNames.WORKSHOP_PARTICIPANTS}
         LEFT JOIN 
         ${tableNames.ATTENDANCE}
         ON 
-        ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.attendanceId}=${tableNames.ATTENDANCE}.${attendance.id}
+        ${tableNames.ATTENDANCE}.workshop_id = ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.workshopId} AND
+        ${tableNames.ATTENDANCE}.participant_id = ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.participantId}
+        LEFT JOIN
+        ${tableNames.USERS}
+        ON
+        ${tableNames.USERS}.user_id = ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.participantId}
         WHERE
         ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.participantId}=${participantId} AND 
         ${tableNames.WORKSHOP_PARTICIPANTS}.${colNames.workshopId}=${workshopId}

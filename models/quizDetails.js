@@ -151,8 +151,7 @@ module.exports = class quizDetails {
         ${tableNames.QUESTIONS}.${questionDetails.option2},
         ${tableNames.QUESTIONS}.${questionDetails.option3},
         ${tableNames.QUESTIONS}.${questionDetails.option4},
-        ${tableNames.QUESTIONS}.${questionDetails.questStmt},
-        ${tableNames.QUESTIONS}.${questionDetails.answer}
+        ${tableNames.QUESTIONS}.${questionDetails.questStmt}
         FROM
         ${tableNames.QUIZ}
         LEFT JOIN
