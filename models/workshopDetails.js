@@ -1,6 +1,9 @@
 const { getDB } = require("../config/db");
 const { tableNames } = require("../utils/constants");
 const { colNames } = require("../utils/constants").workshop_details;
+const { colNames: userColNames } = require("../utils/constants").user; 
+const { colNames: workshopColNames } = require("../utils/constants").workshop; 
+const { colNames: instituteColNames } = require("../utils/constants").institute_details; 
 const { throwError, dbTypes } = require("../utils/helper");
 
 module.exports = class WorkshopDetails {
@@ -158,6 +161,114 @@ module.exports = class WorkshopDetails {
             .query(queryStmt);
         }
         catch(err){
+            throwError(err.originalError.info.message, 500);
+        }
+    };
+
+    static async updateFinanceDetails(workshopId, allotedFunds, expenditure) {
+        const db = getDB();
+        const queryStmt =  `
+            UPDATE ${tableNames.WORKSHOP_DETAILS}
+            SET
+            ${colNames.allotedFunds} = ${'@' + colNames.allotedFunds},
+            ${colNames.expenditure} = ${'@' + colNames.expenditure}
+            WHERE
+            ${colNames.workshopId} = ${'@' + colNames.workshopId}
+        `;
+
+        try {
+            return await db.request()
+            .input(colNames.allotedFunds, dbTypes.BigInt, allotedFunds)
+            .input(colNames.expenditure, dbTypes.BigInt, expenditure)
+            .input(colNames.workshopId, dbTypes.BigInt, workshopId)
+            .query(queryStmt);
+        }
+        catch(err) {
+            throwError(err.originalError.info.message, 500);
+        }
+    };
+
+    static async getWorkshopsFinanceReport(month, year, coordinatorId, maxBudget, areaSpecializationId) {
+        const db = getDB();
+        let queryStmt = `
+            SELECT 
+            ${tableNames.WORKSHOP}.${colNames.workshopId},
+            ${tableNames.WORKSHOP_DETAILS}.${colNames.title},
+            ${tableNames.WORKSHOP_DETAILS}.${colNames.areaSpecializationId},
+            ${colNames.beginDate},
+            ${colNames.endDate},
+            ${colNames.mode},
+            ${colNames.allotedFunds},
+            ${colNames.expenditure},
+            ${userColNames.userId},
+            ${userColNames.firstName},
+            ${userColNames.lastName},
+            ${tableNames.INSTITUTE}.${instituteColNames.id} as institute_id,
+            ${instituteColNames.aicteApproved},
+            ${instituteColNames.instituteName},
+            specialization
+            FROM ${tableNames.WORKSHOP}
+            LEFT JOIN
+            ${tableNames.WORKSHOP_DETAILS}
+            ON ${tableNames.WORKSHOP}.${workshopColNames.workshopId} = ${tableNames.WORKSHOP_DETAILS}.${colNames.workshopId}
+            LEFT JOIN
+            ${tableNames.WORKSHOP_SPECIALIZATION}
+            ON ${tableNames.WORKSHOP_SPECIALIZATION}.id = ${tableNames.WORKSHOP_DETAILS}.${colNames.areaSpecializationId}
+            LEFT JOIN 
+            ${tableNames.USERS}
+            ON ${tableNames.WORKSHOP}.${workshopColNames.coordinatorId} = ${tableNames.USERS}.${userColNames.userId}
+            LEFT JOIN 
+            ${tableNames.INSTITUTE}
+            ON ${tableNames.INSTITUTE}.${instituteColNames.id} = ${tableNames.WORKSHOP}.${workshopColNames.instituteId}
+            WHERE 
+            ${tableNames.WORKSHOP_DETAILS}.${colNames.workshopCompleted} = 1
+        `;
+
+        if(coordinatorId) {
+            queryStmt +=  `
+                AND ${tableNames.USERS}.${userColNames.userId} = ${'@' + userColNames.userId}
+            `;
+        }
+
+        if(areaSpecializationId) {
+            queryStmt += `
+                AND ${tableNames.WORKSHOP_SPECIALIZATION}.id = @area_specialization_id
+            `;
+        }
+
+        if(maxBudget) {
+            queryStmt += `
+                AND ${tableNames.WORKSHOP_DETAILS}.${colNames.expenditure} <= ${'@' + colNames.expenditure}
+            `;
+        }
+        let startDate, endDate;
+
+        if(year) {
+            if(month) {
+                month = Number(month);
+                startDate = new Date(String(year), String(month)), endDate = new Date(String(year), String(Number(month) + 1), '0');
+            }
+            else {
+                startDate = new Date(String(year)), endDate = new Date(String(year), '11', '31');
+            }
+            queryStmt += `
+                AND 
+                    (${tableNames.WORKSHOP_DETAILS}.${colNames.beginDate} BETWEEN ${'@startDate'} AND ${'@endDate'})
+                AND
+                    (${tableNames.WORKSHOP_DETAILS}.${colNames.endDate} BETWEEN ${'@startDate'} AND ${'@endDate'})
+            `;
+        }
+
+        try {
+            return await db.request()
+            .input(userColNames.userId, dbTypes.Int, Number(coordinatorId))
+            .input('area_specialization_id', dbTypes.Int, Number(areaSpecializationId))
+            .input(colNames.expenditure, dbTypes.BigInt, Number(maxBudget))
+            .input('startDate', dbTypes.Date, startDate)
+            .input('endDate', dbTypes.Date, endDate)
+            .query(queryStmt);
+        }
+        catch(err) {
             throwError(err.originalError.info.message, 500);
         }
     };

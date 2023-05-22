@@ -5,7 +5,8 @@ const uploadWorkshopFilesRoutes = require('./workshopUploads');
 const deleteWorkshopFilesRoutes = require('./workshopDeleteFile');
 const getWorkshopFilesRoutes = require('./getWorkshopFiles');
 const quizRoutes=require('./quiz');
-const workshopParticipantsRoutes=require('./workshopParticipants')
+const workshopParticipantsRoutes=require('./workshopParticipants');
+const workshopFinanceRoutes = require("./workshopFinances");
 
 const { addWorkshopSpecialization, getWorkshopSpecializations } = require('../controllers/workshopSpecialization');
 const { verifyCoordinatorRole, verifyAdministratorRole } = require('../middlewares/userAuthorization');
@@ -41,12 +42,14 @@ routes.put("/approve-application", verifyAdministratorRole, workshopApprovalReje
 routes.get("/user-workshops", verifyCoordinatorRole, getUserWorkshops);
 routes.get("/:workshop_id", getWorkshopDetails);
 
-routes.get("/", getAllWorkshops);
+//get Participants
+routes.use('/workshop-participants',verifyCoordinatorRole, workshopParticipantsRoutes)
 
 //quiz Routes
 routes.use('/quiz',quizRoutes);
 
+routes.use("/finance", workshopFinanceRoutes);
 
-//get Participants
-routes.use('/workshop-participants',verifyCoordinatorRole,workshopParticipantsRoutes)
+routes.get("/", getAllWorkshops);
+
 module.exports = routes;

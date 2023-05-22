@@ -117,6 +117,7 @@ exports.coordinator_details = {
 
 exports.institute_details = {
     colNames: {
+        id: 'id',
         coordinator_id: 'coordinator_id',
         aicteApproved: 'aicte_approved',
         pid: 'pid',
