@@ -496,14 +496,8 @@ exports.getWorkshopStmtOfExpenditure = async (req, res, next) => {
 };
 
 exports.getWorkshopCertificate = async (req, res, next) => {
-    const fileId = req.params.fileId;
-
     try {
-        const result = await WorkshopOtherDocs.findDocumentsByFileId(fileId);
-        if(result.recordset.length == 0) {
-            throwError("Could not find the file", 404);
-        }
-        const workshopCertificateUrl = result.recordset[0].certificate_url;
+        const workshopCertificateUrl = `D:\\FINAL YEAR PROJECT\\fdp-backend\\files\\workshop-docs\\certificate\\FDP-Certificate.png`;
         if(!workshopCertificateUrl) {
             throwError("Document not found!", 404);
         }

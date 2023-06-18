@@ -11,7 +11,7 @@ routes.get("/report/:fileId", getWorkshopReport);
 
 routes.get("/stmt-of-expenditure/:fileId", getWorkshopStmtOfExpenditure);
 
-routes.get("/certificate/:fileId", getWorkshopCertificate);
+routes.get("/certificate", getWorkshopCertificate);
 
 routes.get("/brochure/:fileId", getWorkshopBrochure);
 
